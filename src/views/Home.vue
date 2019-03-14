@@ -15,8 +15,9 @@
                     <Poptip trigger="hover" placement="bottom" padding="0px 0px">
                         <Icon type="ios-add-circle-outline" class="icon-add" size="30"/>
                         <div slot="content">
-                            <div class="poptip-item add-group">新建分组</div>
-                            <div class="poptip-item add-project">新建项目</div>
+                            <div class="poptip-item add-group" @click="goAddGroup">新建分组</div>
+                            <div class="poptip-item add-project" @click="goAddProject">新建项目</div>
+                            <div class="poptip-item add-group-member" @click="goAddGroupMember">添加组成员</div>
                         </div>
                     </Poptip>
                 </div>
@@ -28,7 +29,7 @@
                         </div>
                         <!-- <Icon type="ios-add-circle-outline" class="icon-add" size="30"/> -->
                         <div slot="content">
-                            <div class="poptip-item person-info">个人信息</div>
+                            <div class="poptip-item person-info" @click="goUserInfo">个人信息</div>
                             <div class="poptip-item logout" @click="doLogout">退出</div>
                         </div>
                     </Poptip>
@@ -36,7 +37,7 @@
             </div>
         </div>
 
-        <router-view></router-view>
+        <router-view class="main"></router-view>
     </div>
 </template>
 
@@ -52,6 +53,9 @@ export default {
         Icon,
         Poptip
     },
+    created() {
+        this.$store.dispatch('fetchGroupList')
+    },
     data: () => ({}),
     methods: {
         async doLogout() {
@@ -62,11 +66,37 @@ export default {
             } else {
                 this.$Message.error(res.msg)
             }
+        },
+        goAddGroup() {
+            if (this.$route.name !== 'add-group') {
+                this.$router.push({ name: 'add-group' })
+            }
+        },
+        goAddGroupMember() {
+            if (this.$route.name !== 'add-group-member') {
+                this.$router.push({ name: 'add-group-member' })
+            }
+        },
+        goAddProject() {
+            if (this.$route.name !== 'add-project') {
+                this.$router.push({ name: 'add-project' })
+            }
+        },
+        goUserInfo() {
+            if (this.$route.name !== 'user-info') {
+                this.$router.push({
+                    name: 'user-info',
+                    params: { userId: 'hehe' }
+                })
+            }
         }
     }
 }
 </script>
 <style lang="scss">
+.main {
+    height: calc(100vh - 56px);
+}
 .header {
     display: flex;
     height: 56px;

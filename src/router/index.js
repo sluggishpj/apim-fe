@@ -6,6 +6,9 @@ const Login = () => import('@/views/Login.vue')
 const Group = () => import('@/views/Group.vue')
 const Project = () => import('@/views/Project.vue')
 const UserInfo = () => import('@/views/UserInfo.vue')
+const AddGroup = () => import('@/views/group/AddGroup.vue')
+const AddProject = () => import('@/views/project/AddProject.vue')
+const AddGroupMember = () => import('@/views/group/AddGroupMember.vue')
 
 Vue.use(Router)
 
@@ -40,9 +43,24 @@ export default new Router({
                 },
                 {
                     path: '/user/:userId',
-                    name: 'user',
+                    name: 'user-info',
                     component: UserInfo,
                     props: true
+                },
+                {
+                    path: '/add-project',
+                    name: 'add-project',
+                    component: AddProject
+                },
+                {
+                    path: '/add-group',
+                    name: 'add-group',
+                    component: AddGroup
+                },
+                {
+                    path: '/add-group-member',
+                    name: 'add-group-member',
+                    component: AddGroupMember
                 }
             ]
         },

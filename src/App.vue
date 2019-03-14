@@ -10,22 +10,23 @@ export default {
         this.$store.dispatch('fetchUserInfo')
     },
     computed: {
-        ...mapGetters(['username'])
+        ...mapGetters(['username', 'default_group'])
     },
     methods: {
         // 处理登录状态
         handleLoginState({ username, routeName }) {
-            console.log('username', username)
-            console.log('routeName', routeName)
             if (username === null) {
                 console.log('未登录')
                 if (routeName !== 'login') {
                     this.$router.replace({ name: 'login' })
                 }
             } else if (username !== '') {
-                console.log('已登录')
                 if (routeName === 'login') {
-                    this.$router.replace({ name: 'home' })
+                    const default_group = this.default_group || '0'
+                    this.$router.replace({
+                        name: 'group',
+                        params: { groupId: default_group }
+                    })
                 }
             }
         }

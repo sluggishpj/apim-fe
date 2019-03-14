@@ -4,7 +4,7 @@ module.exports = {
     devServer: {
         // 设置代理转发
         proxy: {
-            '/user': {
+            '/api': {
                 target: 'http://localhost:3001/'
             },
         }

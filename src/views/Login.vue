@@ -52,6 +52,8 @@ export default {
         const validateUserName = (rule, value, callback) => {
             if (value.trim() === '') {
                 callback(new Error('用户名不能为空'))
+            } else if (value.trim().length > 50) {
+                callback(new Error('用户名长度不能超过50'))
             } else {
                 callback()
             }
@@ -60,6 +62,8 @@ export default {
         const validatePass = (rule, value, callback) => {
             if (value.trim() === '') {
                 callback(new Error('密码不能为空'))
+            } else if (value.trim().length > 20) {
+                callback(new Error('密码长度不能超过20'))
             } else {
                 if (
                     this.type === 'register' &&
@@ -137,6 +141,7 @@ export default {
             if (res.code === 0) {
                 this.$Message.success('登录成功！')
                 this.$store.commit('setUsername', res.data.username)
+                this.$store.commit('setDefaultGroup', res.data.default_group)
             } else {
                 this.$Message.error(res.msg)
             }
@@ -148,6 +153,7 @@ export default {
             if (res.code === 0) {
                 this.$Message.success('注册成功！')
                 this.$store.commit('setUsername', res.data.username)
+                this.$store.commit('setDefaultGroup', res.data.default_group)
             } else {
                 this.$Message.error(res.msg)
             }
