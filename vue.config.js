@@ -6,7 +6,8 @@ module.exports = {
         proxy: {
             '/api': {
                 target: 'http://localhost:3001/'
-            },
+                // target: 'http://yapi.demo.qunar.com/mock/55227'
+            }
         }
     }
 }

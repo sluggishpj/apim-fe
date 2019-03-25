@@ -7,21 +7,27 @@
                 <div class="project-name">项目名称</div>
             </div>
             <div class="menu-list">
+                <!-- 搜索 -->
                 <div class="search">
                     <Input search placeholder="搜索..."/>
                 </div>
 
+                <!-- 添加功能 -->
                 <div class="add-menu">
                     <Poptip trigger="hover" placement="bottom" padding="0px 0px">
                         <Icon type="ios-add-circle-outline" class="icon-add" size="30"/>
                         <div slot="content">
                             <div class="poptip-item add-group" @click="goAddGroup">新建分组</div>
                             <div class="poptip-item add-project" @click="goAddProject">新建项目</div>
-                            <div class="poptip-item add-group-member" @click="goAddGroupMember">添加组成员</div>
+                            <div
+                                class="poptip-item add-group-member"
+                                @click="goAddGroupMember"
+                            >添加组成员</div>
                         </div>
                     </Poptip>
                 </div>
 
+                <!-- 头像 -->
                 <div class="self">
                     <Poptip trigger="hover" placement="bottom-end" padding="0px 0px">
                         <div class="avatar">
@@ -45,6 +51,7 @@
 // @ is an alias to /src
 import { Input, Icon, Poptip } from 'iview'
 import { logout } from '@/services/index'
+import { mapGetters } from 'vuex'
 
 export default {
     name: 'home',
@@ -53,15 +60,17 @@ export default {
         Icon,
         Poptip
     },
-    created() {
-        this.$store.dispatch('fetchGroupList')
-    },
     data: () => ({}),
+    computed: {
+        ...mapGetters(['userInfo'])
+    },
     methods: {
         async doLogout() {
             const res = await logout()
+            console.log('logout', res)
             if (res.code === 0) {
-                this.$store.commit('setUsername', null)
+                this.$store.commit('setUserInfo', {})
+                this.$store.commit('setGroupList', null)
                 this.$router.replace({ name: 'login' })
             } else {
                 this.$Message.error(res.msg)
@@ -86,7 +95,7 @@ export default {
             if (this.$route.name !== 'user-info') {
                 this.$router.push({
                     name: 'user-info',
-                    params: { userId: 'hehe' }
+                    params: { userId: this.userInfo.userId }
                 })
             }
         }

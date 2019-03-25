@@ -10,24 +10,28 @@ export default {
         this.$store.dispatch('fetchUserInfo')
     },
     computed: {
-        ...mapGetters(['username', 'default_group'])
+        ...mapGetters(['userInfo']),
+        username() {
+            return this.userInfo.username
+        },
+        default_group() {
+            return this.userInfo.default_group
+        }
     },
     methods: {
         // 处理登录状态
         handleLoginState({ username, routeName }) {
-            if (username === null) {
-                console.log('未登录')
-                if (routeName !== 'login') {
-                    this.$router.replace({ name: 'login' })
-                }
-            } else if (username !== '') {
-                if (routeName === 'login') {
-                    const default_group = this.default_group || '0'
-                    this.$router.replace({
-                        name: 'group',
-                        params: { groupId: default_group }
-                    })
-                }
+            if (username && routeName === 'login') {
+                // 在 login 页面且已经是登录状态
+                this.$router.replace({
+                    name: 'group',
+                    params: { groupId: '0' }
+                })
+            } else if (!username && routeName !== 'login') {
+                // 未登录，且不在 login 页面
+                this.$router.replace({
+                    name: 'login'
+                })
             }
         }
     },

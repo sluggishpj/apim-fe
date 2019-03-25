@@ -1,16 +1,22 @@
 import axios from 'axios'
-import { LoadingBar } from 'iview'
+import { LoadingBar, Message } from 'iview'
+
+// 设置超时时间
+axios.defaults.timeout = 20000
+axios.defaults.baseURL = '/api'
 
 // 拦截请求
-axios.defaults.timeout = 30000
-axios.defaults.baseURL = '/api'
-axios.interceptors.request.use(config => {
-    LoadingBar.start()
-    return config
-}, error => {
-    LoadingBar.error()
-    return Promise.reject(error)
-})
+axios.interceptors.request.use(
+    config => {
+        LoadingBar.start()
+        return config
+    },
+    error => {
+        LoadingBar.error()
+        Message.error(error.message)
+        return Promise.reject(error)
+    }
+)
 
 // 拦截响应
 axios.interceptors.response.use(
@@ -20,13 +26,14 @@ axios.interceptors.response.use(
     },
     error => {
         LoadingBar.error()
-        return Promise.reject(error.response.data)
+        Message.error(error.message)
+        return Promise.reject(error)
     }
 )
 
-function doGet(url, params) {
-    return axios.get(url, { params })
-}
+// function doGet(url, params) {
+//     return axios.get(url, { params })
+// }
 
 function doPost(url, params) {
     return axios.post(url, params)
@@ -36,20 +43,20 @@ function doPost(url, params) {
 export const login = ({ username, password }) => doPost('/user/login', { username, password })
 
 // 注册
-export const register = ({ username, password }) =>
-    doPost('/user/register', { username, password })
+export const register = ({ username, password }) => doPost('/user/register', { username, password })
 
 // 获取个人相关信息
 export const getUserInfo = () => doPost('/user/info')
 
-// 更新个人信息
-export const updateUserInfo = data => doPost('/user/update', data)
+// 修改用户名
+export const updateUsername = ({ username }) => doPost('/user/update-username', { username })
 
 // 退出
 export const logout = () => doPost('/user/logout')
 
 // 添加组
-export const addGroup = data => doPost('/group/add-group', data)
+export const addGroup = ({ groupName, groupDesc }) =>
+    doPost('/group/add-group', { groupName, groupDesc })
 
 // 获取本人所有组
 export const getGroupList = () => doPost('/group/group-list')
@@ -58,4 +65,13 @@ export const getGroupList = () => doPost('/group/group-list')
 export const getAllUser = () => doPost('/user/all-user')
 
 // 添加组成员
-export const addGroupMember = (data) => doPost('/group/add-group-member', data)
+export const addGroupMember = ({ groupId, userId }) =>
+    doPost('/group/add-group-member', { groupId, userId })
+
+// 修改组名
+export const updateGroupName = ({ groupId, groupName }) =>
+    doPost('/group/update-group-name', { groupId, groupName })
+
+// 修改组描述
+export const updateGroupDesc = ({ groupId, groupDesc }) =>
+    doPost('/group/update-group-desc', { groupId, groupDesc })

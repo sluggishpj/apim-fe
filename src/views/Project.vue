@@ -5,17 +5,11 @@
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
-
 export default {
     name: 'project',
     props: {
-        projectId: String,
-        default: '0'
+        projectId: { type: String, default: '0' }
     },
-    components: {
-        HelloWorld
-    }
+    components: {}
 }
 </script>

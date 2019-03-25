@@ -105,9 +105,12 @@ export default {
             type: 'login' // 默认进行登录
         }
     },
-    mounted() {
-        console.log(this.$route)
-    },
+    // beforeRouteEnter(to, from, next) {
+    //     if(from.name !== null) {
+    //         window.location.reload()
+    //     }
+    //     next()
+    // },
     methods: {
         goLogin() {
             if (this.type === 'register') {
@@ -140,8 +143,7 @@ export default {
             console.log('login res', res)
             if (res.code === 0) {
                 this.$Message.success('登录成功！')
-                this.$store.commit('setUsername', res.data.username)
-                this.$store.commit('setDefaultGroup', res.data.default_group)
+                this.$store.commit('setUserInfo', res.data)
             } else {
                 this.$Message.error(res.msg)
             }
@@ -152,8 +154,7 @@ export default {
             console.log('register res', res)
             if (res.code === 0) {
                 this.$Message.success('注册成功！')
-                this.$store.commit('setUsername', res.data.username)
-                this.$store.commit('setDefaultGroup', res.data.default_group)
+                this.$store.commit('setUserInfo', res.data)
             } else {
                 this.$Message.error(res.msg)
             }

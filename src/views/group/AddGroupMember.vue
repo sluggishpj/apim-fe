@@ -1,44 +1,47 @@
 // 添加组成员
 <template>
     <div class="add-group-member">
-        <h2 class="title">添加组成员</h2>
-        <Form
-            class="add-member-form"
-            ref="addMemberForm"
-            :model="addMemberForm"
-            :rules="addRules"
-            :label-width="80"
-        >
-            <FormItem class="add-group-form" prop="group_id" label="组名">
-                <Select v-model="addMemberForm.group_id" v-if="groupList">
-                    <Option
-                        v-for="group in groupList"
-                        :value="group._id"
-                        :key="group._id"
-                    >{{ group.group_name }}</Option>
-                </Select>
-            </FormItem>
+        <h2 class="title" v-if="userInfo.role === 'member'">无权限</h2>
+        <div v-else>
+            <h2 class="title">添加组成员</h2>
+            <Form
+                class="add-member-form"
+                ref="addMemberForm"
+                :model="addMemberForm"
+                :rules="addRules"
+                :label-width="80"
+            >
+                <FormItem class="add-group-form" prop="groupId" label="组名">
+                    <Select v-model="addMemberForm.groupId" v-if="groupList">
+                        <Option
+                            v-for="group in groupList"
+                            :value="group.groupId"
+                            :key="group.groupId"
+                        >{{ group.groupName }}</Option>
+                    </Select>
+                </FormItem>
 
-            <FormItem prop="username" label="名字">
-                <AutoComplete
-                    v-model="addMemberForm.username"
-                    :data="tipsList"
-                    @on-search="handleSearchMember"
-                    placeholder="输入要添加的成员名字"
-                    :transfer="true"
-                ></AutoComplete>
-            </FormItem>
+                <FormItem prop="username" label="名字">
+                    <AutoComplete
+                        v-model="addMemberForm.username"
+                        :data="tipsList"
+                        @on-search="handleSearchMember"
+                        placeholder="输入要添加的成员名字"
+                        :transfer="true"
+                    ></AutoComplete>
+                </FormItem>
 
-            <FormItem>
-                <Button type="primary" @click="handleSubmit">提交</Button>
-                <Button style="margin-left: 26px" @click="cancel">取消</Button>
-            </FormItem>
-        </Form>
+                <FormItem>
+                    <Button type="primary" @click="handleSubmit">提交</Button>
+                    <Button style="margin-left: 26px" @click="cancel">返回</Button>
+                </FormItem>
+            </Form>
+        </div>
     </div>
 </template>
 
 <script>
-import { Form, FormItem, Input, AutoComplete, Select, Option } from 'iview'
+import { Form, FormItem, AutoComplete, Select, Option } from 'iview'
 import { addGroupMember, getAllUser } from '@/services'
 import { mapGetters } from 'vuex'
 
@@ -47,24 +50,13 @@ export default {
     components: {
         Form,
         FormItem,
-        Input,
         AutoComplete,
         Select,
         Option
     },
     async created() {
-        try {
-            const res = await getAllUser()
-            console.log('getAllUser', res)
-            if (res.code === 0) {
-                this.userList = res.data
-                this.userNameList = res.data.map(v => v.username)
-            } else {
-                this.$Message.error(res.msg)
-            }
-        } catch (err) {
-            console.log('getAllUser', err)
-        }
+        this.fetchUser()
+        this.$store.dispatch('fetchGroupList')
     },
 
     data() {
@@ -88,11 +80,11 @@ export default {
         }
         return {
             addMemberForm: {
-                group_id: '',
+                groupId: '',
                 username: ''
             },
             addRules: {
-                group_id: [{ validator: validateGroupName, trigger: 'blur' }],
+                groupId: [{ validator: validateGroupName, trigger: 'blur' }],
                 username: [{ validator: validateMember, trigger: 'blur' }]
             },
             tipsList: [],
@@ -102,10 +94,24 @@ export default {
     },
 
     methods: {
+        async fetchUser() {
+            try {
+                const res = await getAllUser()
+                console.log('getAllUser', res)
+                if (res.code === 0) {
+                    this.userList = res.data
+                    this.userNameList = res.data.map(v => v.username)
+                } else {
+                    this.$Message.error(res.msg)
+                }
+            } catch (err) {
+                console.log('getAllUser', err)
+            }
+        },
         handleSearchMember(value) {
-            const filterRes = this.userNameList.filter(v => {
-                return v.indexOf(value) !== -1
-            })
+            const filterRes = this.userNameList.filter(
+                v => v.indexOf(value) !== -1
+            )
             this.tipsList = !value ? [] : filterRes
         },
         handleSubmit() {
@@ -113,22 +119,26 @@ export default {
             this.$refs.addMemberForm.validate(async valid => {
                 console.log('valid', valid)
                 if (valid) {
-                    const user_id = this.userList.find(user => {
-                        return user.username === this.addMemberForm.username
-                    })._id
+                    const { userId } = this.userList.find(
+                        user => user.username === this.addMemberForm.username
+                    )
 
-                    console.log('user_id', user_id)
+                    console.log('userId', userId)
 
-                    const res = await addGroupMember({
-                        group_id: this.addMemberForm.group_id,
-                        user_id
-                    })
+                    try {
+                        const res = await addGroupMember({
+                            userId,
+                            groupId: this.addMemberForm.groupId
+                        })
 
-                    console.log('addGroupMember', res)
-                    if (res.code === 0) {
-                        this.$Message.success('Success!')
-                    } else {
-                        this.$Message.error(res.msg)
+                        console.log('addGroupMember', res)
+                        if (res.code === 0) {
+                            this.$Message.success('添加成员成功')
+                        } else {
+                            this.$Message.error(res.msg)
+                        }
+                    } catch (err) {
+                        console.log('addGroupMember err', err)
                     }
                 } else {
                     this.$Message.error('请按要求完善信息')
@@ -141,7 +151,7 @@ export default {
     },
 
     computed: {
-        ...mapGetters(['groupList'])
+        ...mapGetters(['userInfo', 'groupList'])
     }
 }
 </script>
