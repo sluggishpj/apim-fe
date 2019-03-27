@@ -13,9 +13,6 @@ export default {
         ...mapGetters(['userInfo']),
         username() {
             return this.userInfo.username
-        },
-        default_group() {
-            return this.userInfo.default_group
         }
     },
     methods: {

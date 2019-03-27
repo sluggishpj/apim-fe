@@ -25,7 +25,11 @@
                 <div class="group-info-wrapper">
                     <Tabs v-model="groupMenu">
                         <TabPane name="projectList" label="项目列表" icon="md-apps">这是项目列表</TabPane>
-                        <TabPane name="memberList" label="人员管理" icon="md-people">这是人员管理</TabPane>
+
+                        <TabPane name="memberList" label="人员管理" icon="md-people">
+                            <GroupMember :groupId="groupId"/>
+                        </TabPane>
+
                         <TabPane
                             name="groupInfo"
                             v-if="groupId !== userInfo.defaultGroup"
@@ -45,7 +49,8 @@
 // @ is an alias to /src
 import { Split, Card, CellGroup, Cell, Tabs, TabPane } from 'iview'
 import { mapGetters } from 'vuex'
-const GroupInfo = () => import('@/components/GroupInfo.vue')
+const GroupInfo = () => import('@/components/group/GroupInfo.vue')
+const GroupMember = () => import('@/components/group/GroupMember.vue')
 
 export default {
     name: 'group',
@@ -59,6 +64,7 @@ export default {
 
     components: {
         GroupInfo,
+        GroupMember,
         Split,
         Card,
         CellGroup,
@@ -68,8 +74,14 @@ export default {
     },
 
     beforeRouteUpdate(to, from, next) {
-        // 进行初始化
-        this.groupMenu = 'projectList'
+        // 如果跳到个人组，则判断当前的 groupMenu 是否在分组管理
+        // 是的话则切换到项目列表
+        if (
+            to.params.groupId === this.userInfo.defaultGroup &&
+            this.groupMenu === 'groupInfo'
+        ) {
+            this.groupMenu = 'projectList'
+        }
         next()
     },
 

@@ -75,3 +75,17 @@ export const updateGroupName = ({ groupId, groupName }) =>
 // 修改组描述
 export const updateGroupDesc = ({ groupId, groupDesc }) =>
     doPost('/group/update-group-desc', { groupId, groupDesc })
+
+// 删除分组
+export const deleteGroup = ({ groupId }) => doPost('/group/delete-group', { groupId })
+
+// 获取组成员
+export const getGroupMember = ({ groupId }) => doPost('/group/group-member', { groupId })
+
+// 设置组员角色
+export const setGroupMemberRole = ({ groupId, userId, role }) =>
+    doPost('/group/set-group-member-role', { groupId, userId, role })
+
+// 删除组成员
+export const deleteGroupMember = ({ groupId, userId }) =>
+    doPost('/group/delete-group-member', { groupId, userId })

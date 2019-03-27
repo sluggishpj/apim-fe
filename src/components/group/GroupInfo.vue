@@ -17,6 +17,11 @@
             v-model="isShowGroupDesc"
             @confirm="confirmGroupDesc"
         />
+
+        <Divider/>
+
+        <Button type="error" @click="confirmDelete">删除分组</Button>
+        <Divider/>
     </div>
 </template>
 
@@ -24,7 +29,7 @@
 // @ is an alias to /src
 import BaseEdit from '@/components/BaseEdit.vue'
 import { mapGetters } from 'vuex'
-import { updateGroupName, updateGroupDesc } from '@/services/index'
+import { updateGroupName, updateGroupDesc, deleteGroup } from '@/services/index'
 import { Divider } from 'iview'
 
 export default {
@@ -57,20 +62,21 @@ export default {
         }
     },
     methods: {
-        async confirmGroupName(newVal) {
+        // 确定组名
+        async confirmGroupName(newGroupName) {
             if (!this.isLoading) {
                 this.isLoading = true
-                console.log('confirmGroupName', newVal)
+                console.log('confirmGroupName', newGroupName)
                 try {
                     const res = await updateGroupName({
                         groupId: this.groupId,
-                        groupName: newVal
+                        groupName: newGroupName
                     })
 
                     if (res.code === 0) {
                         this.$Message.success('修改组名成功')
                         this.isShowGroupName = true
-                        this.$set(this.groupObj, 'groupName', newVal)
+                        this.$set(this.groupObj, 'groupName', newGroupName)
                     } else {
                         this.$Message.error(res.msg)
                     }
@@ -82,20 +88,20 @@ export default {
             }
         },
 
-        async confirmGroupDesc(newVal) {
+        async confirmGroupDesc(newGroupDesc) {
             if (!this.isLoading) {
                 this.isLoading = true
-                console.log('confirmGroupDesc', newVal)
+                console.log('confirmGroupDesc', newGroupDesc)
                 try {
                     const res = await updateGroupDesc({
                         groupId: this.groupId,
-                        groupDesc: newVal
+                        groupDesc: newGroupDesc
                     })
 
                     if (res.code === 0) {
                         this.$Message.success('修改组描述成功')
                         this.isShowGroupDesc = true
-                        this.$set(this.groupObj, 'groupDesc', newVal)
+                        this.$set(this.groupObj, 'groupDesc', newGroupDesc)
                     } else {
                         this.$Message.error(res.msg)
                     }
@@ -105,6 +111,48 @@ export default {
                     console.log('confirmGroupDesc err', err)
                 }
             }
+        },
+
+        // 删除分组
+        confirmDelete() {
+            this.$Modal.confirm({
+                title: '警告',
+                content: '<h3>确定删除该组？</h3>',
+                loading: true,
+                onOk: async () => {
+                    try {
+                        const deleteRes = await deleteGroup({
+                            groupId: this.groupId
+                        })
+
+                        console.log('deleteGroup', deleteRes)
+                        if (deleteRes.code === 0) {
+                            // 删除成功
+                            this.$Modal.remove()
+                            this.$Message.info('删除成功')
+
+                            // 从 vuex 中删除
+                            this.$store.commit('deleteGroup', {
+                                groupId: deleteRes.data.groupId
+                            })
+
+                            // 跳转回首页
+                            this.$router.replace({
+                                name: 'group',
+                                params: { groupId: '0' }
+                            })
+                        } else {
+                            // 删除失败
+                            this.$Modal.remove()
+                            this.$Message.error(deleteRes.msg)
+                        }
+                    } catch (err) {
+                        this.$Modal.remove()
+                        console.log('deleteGroup err', err)
+                        this.$Message.error('出错了')
+                    }
+                }
+            })
         }
     }
 }

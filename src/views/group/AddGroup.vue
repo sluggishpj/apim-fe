@@ -74,16 +74,14 @@ export default {
         handleSubmit() {
             console.log('handleSubmit')
             this.$refs.addGroupForm.validate(async valid => {
-                console.log('valid', valid)
                 if (valid) {
                     const res = await addGroup(this.addGroupForm)
                     console.log('addGroup', res)
+
                     if (res.code === 0) {
                         this.$Message.success('添加成功')
-                        this.$store.commit('setGroupList', [
-                            ...this.groupList,
-                            res.data
-                        ])
+                        // 添加进 vuex
+                        this.$store.commit('addGroup', res.data)
                     } else {
                         this.$Message.error(res.msg)
                     }

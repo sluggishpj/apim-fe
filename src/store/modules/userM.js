@@ -23,9 +23,6 @@ const actions = {
             if (res.code === 0) {
                 // 成功，说明已登录
                 commit('setUserInfo', res.data)
-            } else {
-                // commit('setUsername', null)
-                Message.error(res.msg)
             }
         } catch (err) {
             console.log('fetchUserInfo 服务器出错了', err)

@@ -13,12 +13,11 @@
                 </div>
 
                 <!-- 添加功能 -->
-                <div class="add-menu">
+                <div class="add-menu" v-if="isAdmin">
                     <Poptip trigger="hover" placement="bottom" padding="0px 0px">
                         <Icon type="ios-add-circle-outline" class="icon-add" size="30"/>
                         <div slot="content">
                             <div class="poptip-item add-group" @click="goAddGroup">新建分组</div>
-                            <div class="poptip-item add-project" @click="goAddProject">新建项目</div>
                             <div
                                 class="poptip-item add-group-member"
                                 @click="goAddGroupMember"
@@ -33,7 +32,6 @@
                         <div class="avatar">
                             <img src="http://yapi.demo.qunar.com/api/user/avatar?uid=80629">
                         </div>
-                        <!-- <Icon type="ios-add-circle-outline" class="icon-add" size="30"/> -->
                         <div slot="content">
                             <div class="poptip-item person-info" @click="goUserInfo">个人信息</div>
                             <div class="poptip-item logout" @click="doLogout">退出</div>
@@ -62,7 +60,10 @@ export default {
     },
     data: () => ({}),
     computed: {
-        ...mapGetters(['userInfo'])
+        ...mapGetters(['userInfo']),
+        isAdmin() {
+            return this.userInfo.role === 'admin'
+        }
     },
     methods: {
         async doLogout() {
@@ -70,7 +71,7 @@ export default {
             console.log('logout', res)
             if (res.code === 0) {
                 this.$store.commit('setUserInfo', {})
-                this.$store.commit('setGroupList', null)
+                this.$store.commit('setGroupList', [])
                 this.$router.replace({ name: 'login' })
             } else {
                 this.$Message.error(res.msg)
@@ -127,14 +128,14 @@ export default {
         display: flex;
         align-items: center;
         .add-menu {
-            margin: 0 20px;
+            margin-left: 30px;
             .icon-add {
                 padding: 2px;
             }
         }
 
         .self {
-            margin-right: 30px;
+            margin: 0 30px;
             display: flex;
             align-items: center;
             line-height: 0;

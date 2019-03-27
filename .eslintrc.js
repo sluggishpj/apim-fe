@@ -27,7 +27,10 @@ module.exports = {
         'space-before-function-paren': 0,
         'no-shadow': 0,
         'no-param-reassign': 0,
-        'import/newline-after-import': 0
+        'import/newline-after-import': 0,
+        'function-paren-newline': 0,
+        'default-case': 0,
+        'max-len': 0
     },
     parserOptions: {
         parser: 'babel-eslint'
