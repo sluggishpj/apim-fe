@@ -33,7 +33,7 @@ import { updateGroupName, updateGroupDesc, deleteGroup } from '@/services/index'
 import { Divider } from 'iview'
 
 export default {
-    name: 'group-info',
+    name: 'GroupInfo',
     components: {
         BaseEdit,
         Divider

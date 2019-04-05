@@ -11,7 +11,7 @@ const getters = {
 
 const actions = {
     // 获取组列表
-    async fetchGroupList({ state, commit }) {
+    async fetchGroupList({ state, commit, rootState }) {
         if (state.groupList.length === 0) {
             // 还没获取过
             try {

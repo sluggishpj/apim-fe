@@ -12,7 +12,7 @@
                                     :title="`${group.groupName || '个人组'}`"
                                     :label="group.groupDesc"
                                     :selected="groupId === group.groupId"
-                                    :to="`/group/${group.groupId}`"
+                                    :to="{name: 'group', params: {groupId: group.groupId, title: group.groupName}}"
                                 >
                                     <!-- <Icon slot="extra" type="ios-cube-outline" size="16" /> -->
                                 </Cell>
@@ -24,16 +24,23 @@
             <div slot="right" class="demo-split-pane">
                 <div class="group-info-wrapper">
                     <Tabs v-model="groupMenu">
-                        <TabPane name="projectList" label="项目列表" icon="md-apps">这是项目列表</TabPane>
+                        <TabPane name="projectList" label="项目列表" icon="md-apps">
+                            <ProjectList :groupId="groupId"/>
+                        </TabPane>
 
-                        <TabPane name="memberList" label="人员管理" icon="md-people">
+                        <TabPane
+                            v-if="!isSelfGroup"
+                            name="memberList"
+                            label="组成员管理"
+                            icon="md-people"
+                        >
                             <GroupMember :groupId="groupId"/>
                         </TabPane>
 
                         <TabPane
                             name="groupInfo"
                             v-if="groupId !== userInfo.defaultGroup"
-                            label="分组管理"
+                            label="组信息管理"
                             icon="md-settings"
                         >
                             <GroupInfo :groupId="groupId"/>
@@ -48,10 +55,10 @@
 <script>
 // @ is an alias to /src
 import { Split, Card, CellGroup, Cell, Tabs, TabPane } from 'iview'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 const GroupInfo = () => import('@/components/group/GroupInfo.vue')
 const GroupMember = () => import('@/components/group/GroupMember.vue')
-
+const ProjectList = () => import('@/components/project/ProjectList.vue')
 export default {
     name: 'group',
     props: {
@@ -63,6 +70,7 @@ export default {
     },
 
     components: {
+        ProjectList,
         GroupInfo,
         GroupMember,
         Split,
@@ -74,19 +82,58 @@ export default {
     },
 
     beforeRouteUpdate(to, from, next) {
-        // 如果跳到个人组，则判断当前的 groupMenu 是否在分组管理
-        // 是的话则切换到项目列表
-        if (
-            to.params.groupId === this.userInfo.defaultGroup &&
-            this.groupMenu === 'groupInfo'
-        ) {
-            this.groupMenu = 'projectList'
+        // 如果跳到个人组，则判断当前的 groupMenu 是否在项目列表
+        // 不是的话则切换到项目列表
+        const groupId = to.params.groupId
+        if (groupId === '0') {
+            // 回到主页
+            this.goDefaultGroup()
+        } else {
+            this.doSetBreadCrumbDesc(groupId)
+            if (
+                groupId === this.userInfo.defaultGroup &&
+                this.groupMenu !== 'projectList'
+            ) {
+                // 从其他组跳到个人组，需要隐藏部分功能按钮
+                this.groupMenu = 'projectList'
+            }
+            next()
         }
-        next()
+    },
+
+    beforeRouteEnter(to, from, next) {
+        const groupId = to.params.groupId
+        if (groupId === '0') {
+            // 回到主页
+            next(vm => {
+                vm.goDefaultGroup()
+            })
+        } else {
+            next(vm => {
+                vm.doSetBreadCrumbDesc(groupId)
+            })
+        }
     },
 
     computed: {
-        ...mapGetters(['userInfo', 'groupList'])
+        ...mapGetters(['userInfo', 'groupList']),
+        // 是否是个人组
+        isSelfGroup() {
+            return this.groupId === this.userInfo.defaultGroup
+        },
+        // 默认显示的组信息
+        defaultGroupId() {
+            let groupId = '0'
+            const userInfo = this.userInfo
+            const groupList = this.groupList
+
+            if (userInfo.role === 'admin' && groupList.length) {
+                groupId = groupList[0].groupId
+            } else if (userInfo.role === 'member') {
+                groupId = userInfo.defaultGroup
+            }
+            return { groupId }
+        }
     },
 
     data: () => ({
@@ -94,22 +141,48 @@ export default {
         groupMenu: 'projectList'
     }),
 
-    watch: {
-        groupList(groupList) {
-            // 获取到列表后
-            if (this.groupId === '0') {
-                const defaultGroup =
-                    this.userInfo.defaultGroup ||
-                    (groupList.length && groupList[0].groupId)
+    methods: {
+        ...mapMutations(['setBreadCrumbDesc']),
 
-                if (defaultGroup) {
-                    this.$router.replace({
-                        name: 'group',
-                        params: {
-                            groupId: defaultGroup
-                        }
-                    })
+        // 跳转到默认显示的组
+        goDefaultGroup() {
+            this.$router.replace({
+                name: 'group',
+                params: {
+                    groupId: this.defaultGroupId.groupId
                 }
+            })
+        },
+
+        // 根据groupId查找目标组
+        findTargetGroup(groupId) {
+            return this.groupList.find(group => group.groupId === groupId)
+        },
+
+        // 修改当前面包屑描述
+        doSetBreadCrumbDesc(groupId) {
+            const targetGroup = this.findTargetGroup(groupId)
+            let title = ''
+
+            if (targetGroup) {
+                if (!targetGroup.groupName) {
+                    title = '个人组'
+                } else {
+                    title = targetGroup.groupName
+                }
+            }
+
+            this.setBreadCrumbDesc({ name: 'group', title })
+        }
+    },
+
+    watch: {
+        groupList() {
+            // 获取到组列表后
+            if (this.groupId === '0') {
+                this.goDefaultGroup()
+            } else {
+                this.doSetBreadCrumbDesc(this.groupId)
             }
         }
     }

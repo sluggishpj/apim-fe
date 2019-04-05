@@ -2,10 +2,10 @@
     <div class="home">
         <div class="header">
             <div class="nav">
-                <div class="group-name">个人空间</div>
-                <div class="icon-split">/</div>
-                <div class="project-name">项目名称</div>
+                <!-- 面包屑 -->
+                <CustomBreadCrumb :list="breadCrumbList"/>
             </div>
+
             <div class="menu-list">
                 <!-- 搜索 -->
                 <div class="search">
@@ -49,23 +49,27 @@
 // @ is an alias to /src
 import { Input, Icon, Poptip } from 'iview'
 import { logout } from '@/services/index'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
+import CustomBreadCrumb from '@/components/CustomBreadCrumb.vue'
+import routers from '@/router/routers'
 
 export default {
     name: 'home',
     components: {
         Input,
         Icon,
-        Poptip
+        Poptip,
+        CustomBreadCrumb
     },
-    data: () => ({}),
+    mounted() {},
     computed: {
-        ...mapGetters(['userInfo']),
+        ...mapGetters(['userInfo', 'breadCrumbList']),
         isAdmin() {
             return this.userInfo.role === 'admin'
         }
     },
     methods: {
+        // 退出登录
         async doLogout() {
             const res = await logout()
             console.log('logout', res)
@@ -77,21 +81,22 @@ export default {
                 this.$Message.error(res.msg)
             }
         },
+
+        // 跳转到添加组
         goAddGroup() {
             if (this.$route.name !== 'add-group') {
                 this.$router.push({ name: 'add-group' })
             }
         },
+
+        // 跳转到添加组成员
         goAddGroupMember() {
             if (this.$route.name !== 'add-group-member') {
                 this.$router.push({ name: 'add-group-member' })
             }
         },
-        goAddProject() {
-            if (this.$route.name !== 'add-project') {
-                this.$router.push({ name: 'add-project' })
-            }
-        },
+
+        // 跳转到用户详情
         goUserInfo() {
             if (this.$route.name !== 'user-info') {
                 this.$router.push({
@@ -104,18 +109,24 @@ export default {
 }
 </script>
 <style lang="scss">
+.home {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
 .main {
-    height: calc(100vh - 56px);
+    flex: 1;
 }
 .header {
+    flex: 0 0 56px;
     display: flex;
-    height: 56px;
     justify-content: space-between;
     border-bottom: 1px solid;
     align-items: center;
     background: #0f2540;
     color: #fff;
     .nav {
+        color: #fff;
         display: flex;
         font-size: 16px;
         padding-left: 20px;
@@ -169,5 +180,13 @@ export default {
     .add-group {
         border-bottom: 1px solid #e8eaec;
     }
+}
+
+// 面包屑样式
+.ivu-breadcrumb > span:last-child {
+    color: #fff;
+}
+.ivu-breadcrumb a {
+    color: #fff;
 }
 </style>

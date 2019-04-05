@@ -30,7 +30,8 @@ module.exports = {
         'import/newline-after-import': 0,
         'function-paren-newline': 0,
         'default-case': 0,
-        'max-len': 0
+        'max-len': 0,
+        'prefer-destructuring': 0
     },
     parserOptions: {
         parser: 'babel-eslint'

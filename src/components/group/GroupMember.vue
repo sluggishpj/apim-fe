@@ -1,6 +1,9 @@
 <template>
     <div class="group-member">
-        <div class="title">共 {{groupMemberList.length}} 人</div>
+        <div class="title">
+            <div class="member-count">人数：共 {{groupMemberList.length}} 人</div>
+            <Button type="primary" v-if="isAdminOrLeader" @click="goAddMember">添加组成员</Button>
+        </div>
 
         <template v-for="(userList, idx) in [groupLeaderList, groupDevList]">
             <div class="member" v-for="member in userList" :key="member.userId">
@@ -17,7 +20,7 @@
                 <!-- 设置 -->
                 <div class="setting" v-if="isAdminOrLeader">
                     <Dropdown @on-click="handleMenuClick" trigger="click" :transfer="true">
-                        <Icon size="24" type="md-settings"/>
+                        <Icon size="24" type="md-settings" class="setting-icon"/>
                         <DropdownMenu slot="list">
                             <DropdownItem v-if="idx!==0" :name="`setLeader,${member.userId}`">设置为组长</DropdownItem>
                             <DropdownItem
@@ -47,6 +50,7 @@ import { Icon, Dropdown, DropdownMenu, DropdownItem } from 'iview'
 import { mapGetters } from 'vuex'
 
 export default {
+    name: 'GroupMember',
     props: {
         groupId: {
             type: String,
@@ -117,6 +121,15 @@ export default {
             } catch (err) {
                 console.log('getGroupMember err', err)
             }
+        },
+
+        // 跳转到添加组成员
+        goAddMember() {
+            console.log('goAddMember')
+            this.$router.push({
+                name: 'add-group-member',
+                params: { groupId: this.groupId }
+            })
         },
 
         // 处理菜单点击事件
@@ -231,7 +244,15 @@ export default {
 <style lang="scss" scoped>
 .group-member {
     font-size: 14px;
-    .title {
+}
+.title {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 60px;
+    background: #eee;
+    .member-count {
+        font-size: 14px;
         font-weight: bold;
     }
 }
@@ -246,10 +267,9 @@ export default {
         background: #f3f3f3;
     }
     .username {
-        cursor: pointer;
+        flex: 1 0;
         a {
-            display: flex;
-            padding: 0 40px;
+            padding: 0 20px;
             color: #0f2540;
             text-decoration: none;
             &:hover {
@@ -258,8 +278,14 @@ export default {
         }
     }
 
+    .role {
+        flex: 1 0;
+    }
+
     .setting {
-        &:hover {
+        flex: 0 0 100px;
+        margin: 0 20px;
+        .setting-icon {
             cursor: pointer;
         }
     }

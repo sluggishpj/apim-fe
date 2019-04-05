@@ -1,42 +1,39 @@
 // 添加组成员
 <template>
     <div class="add-group-member">
-        <h2 class="title" v-if="userInfo.role === 'member'">无权限</h2>
-        <div v-else>
-            <h2 class="title">添加组成员</h2>
-            <Form
-                class="add-member-form"
-                ref="addMemberForm"
-                :model="addMemberForm"
-                :rules="addRules"
-                :label-width="80"
-            >
-                <FormItem class="add-group-form" prop="groupId" label="组名">
-                    <Select v-model="addMemberForm.groupId" v-if="groupList">
-                        <Option
-                            v-for="group in groupList"
-                            :value="group.groupId"
-                            :key="group.groupId"
-                        >{{ group.groupName }}</Option>
-                    </Select>
-                </FormItem>
+        <h2 class="title">添加组成员</h2>
+        <Form
+            class="add-member-form"
+            ref="addMemberForm"
+            :model="addMemberForm"
+            :rules="addRules"
+            :label-width="80"
+        >
+            <FormItem class="add-group-form" prop="groupId" label="组名">
+                <Select v-model="addMemberForm.groupId" v-if="filterGroupList">
+                    <Option
+                        v-for="group in filterGroupList"
+                        :value="group.groupId"
+                        :key="group.groupId"
+                    >{{ group.groupName }}</Option>
+                </Select>
+            </FormItem>
 
-                <FormItem prop="username" label="名字">
-                    <AutoComplete
-                        v-model="addMemberForm.username"
-                        :data="tipsList"
-                        @on-search="handleSearchMember"
-                        placeholder="输入要添加的成员名字"
-                        :transfer="true"
-                    ></AutoComplete>
-                </FormItem>
+            <FormItem prop="username" label="名字">
+                <AutoComplete
+                    v-model="addMemberForm.username"
+                    :data="tipsList"
+                    @on-search="handleSearchMember"
+                    placeholder="输入要添加的成员名字"
+                    :transfer="true"
+                ></AutoComplete>
+            </FormItem>
 
-                <FormItem>
-                    <Button type="primary" @click="handleSubmit">提交</Button>
-                    <Button style="margin-left: 26px" @click="cancel">返回</Button>
-                </FormItem>
-            </Form>
-        </div>
+            <FormItem>
+                <Button type="primary" @click="handleSubmit">提交</Button>
+                <Button style="margin-left: 26px" @click="cancel">返回</Button>
+            </FormItem>
+        </Form>
     </div>
 </template>
 
@@ -47,6 +44,12 @@ import { mapGetters } from 'vuex'
 
 export default {
     name: 'add-group-member',
+    props: {
+        groupId: {
+            type: String,
+            default: ''
+        }
+    },
     components: {
         Form,
         FormItem,
@@ -54,6 +57,15 @@ export default {
         Select,
         Option
     },
+
+    beforeRouteEnter(to, from, next) {
+        next(vm => {
+            if (to.params.groupId) {
+                vm.addMemberForm.groupId = to.params.groupId
+            }
+        })
+    },
+
     async created() {
         this.fetchUser()
         this.$store.dispatch('fetchGroupList')
@@ -151,7 +163,21 @@ export default {
     },
 
     computed: {
-        ...mapGetters(['userInfo', 'groupList'])
+        ...mapGetters(['userInfo', 'groupList']),
+
+        // 如果是从从组员信息那里跳转过来的，只展示那个组
+        filterGroupList() {
+            const groupId = this.addMemberForm.groupId
+            if (this.addMemberForm.groupId === '') {
+                return this.groupList
+            } else {
+                return [
+                    this.groupList.find(
+                        group => group.groupId === this.addMemberForm.groupId
+                    )
+                ]
+            }
+        }
     }
 }
 </script>
