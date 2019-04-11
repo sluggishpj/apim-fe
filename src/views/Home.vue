@@ -49,9 +49,8 @@
 // @ is an alias to /src
 import { Input, Icon, Poptip } from 'iview'
 import { logout } from '@/services/index'
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters } from 'vuex'
 import CustomBreadCrumb from '@/components/CustomBreadCrumb.vue'
-import routers from '@/router/routers'
 
 export default {
     name: 'home',

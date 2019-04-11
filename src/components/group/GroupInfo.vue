@@ -149,7 +149,6 @@ export default {
                     } catch (err) {
                         this.$Modal.remove()
                         console.log('deleteGroup err', err)
-                        this.$Message.error('出错了')
                     }
                 }
             })

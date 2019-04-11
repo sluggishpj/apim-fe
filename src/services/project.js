@@ -17,7 +17,7 @@ export function getProjectList({ groupId }) {
 }
 
 // 获取某个项目信息
-export function getProjectInfoById({ projectId }) {
+export function getProjectInfo({ projectId }) {
     return doPost('/project/project-info', { projectId })
 }
 
@@ -48,4 +48,19 @@ export function addProjectMember({ projectId, userId }) {
 // 获取项目成员
 export function getProjectMember({ projectId }) {
     return doPost('/project/project-member', { projectId })
+}
+
+// 删除项目
+export function deleteProject({ projectId }) {
+    return doPost('/project/delete-project', { projectId })
+}
+
+// 设置项目成员角色
+export function setProjectMemberRole({ userId, projectId, role }) {
+    return doPost('/project/set-project-member-role', { userId, projectId, role })
+}
+
+// 删除项目成员
+export function deleteProjectMember({ userId, projectId }) {
+    return doPost('/project/delete-project-member', { userId, projectId })
 }

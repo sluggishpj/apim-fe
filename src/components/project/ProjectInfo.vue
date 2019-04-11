@@ -48,7 +48,8 @@
             </FormItem>
 
             <FormItem>
-                <Button type="primary" @click="handleSubmit">保存</Button>
+                <Button type="primary" class="btn save-btn" @click="handleSubmit">保存</Button>
+                <Button type="warning" class="btn deleteProject-btn" @click="deleteProject">删除该项目</Button>
             </FormItem>
         </Form>
     </div>
@@ -56,17 +57,13 @@
 <script>
 import { Form, FormItem, Input, Select, Option, RadioGroup, Radio } from 'iview'
 import { mapGetters } from 'vuex'
-import { updateProjectInfo } from '@/services'
+import { updateProjectInfo, deleteProject } from '@/services'
 
 export default {
     name: 'ProjectInfo',
     props: {
         projectId: {
             type: String,
-            required: true
-        },
-        projectInfo: {
-            type: Object,
             required: true
         }
     },
@@ -105,7 +102,7 @@ export default {
                 this.$set(
                     this.updateProjectForm,
                     'basePath',
-                    '/' + value.trim()
+                    `/${value.trim()}`
                 )
             }
             if (value.trim().length > 100) {
@@ -119,7 +116,7 @@ export default {
             updateProjectForm: {
                 projectName: '',
                 projectDesc: '',
-                groupId: '',
+                projectId: '',
                 projectType: '',
                 basePath: ''
             },
@@ -131,7 +128,7 @@ export default {
                 projectDesc: [
                     { validator: validateProjectDesc, trigger: 'blur' }
                 ],
-                groupId: [
+                projectId: [
                     { required: true, message: '请选择组', trigger: 'change' }
                 ],
                 projectType: [
@@ -158,7 +155,6 @@ export default {
 
                     if (res.code === 0) {
                         this.$Message.success('修改成功')
-                        this.$emit('on-update')
                     } else {
                         this.$Message.error(res.msg)
                     }
@@ -166,10 +162,45 @@ export default {
                     this.$Message.error('请按要求完善信息')
                 }
             })
+        },
+
+        deleteProject() {
+            this.$Modal.confirm({
+                title: '警告',
+                content: '<h3>确定删除该项目？</h3>',
+                loading: true,
+                onOk: async () => {
+                    try {
+                        const deleteRes = await deleteProject({
+                            projectId: this.projectId
+                        })
+
+                        console.log('deleteProject', deleteRes)
+                        if (deleteRes.code === 0) {
+                            // 删除成功
+                            this.$Modal.remove()
+                            this.$Message.info('删除成功')
+
+                            // 跳转回首页
+                            this.$router.replace({
+                                name: 'group',
+                                params: { projectId: '0' }
+                            })
+                        } else {
+                            // 删除失败
+                            this.$Modal.remove()
+                            this.$Message.error(deleteRes.msg)
+                        }
+                    } catch (err) {
+                        this.$Modal.remove()
+                        console.log('deleteProject err', err)
+                    }
+                }
+            })
         }
     },
     computed: {
-        ...mapGetters(['groupList'])
+        ...mapGetters(['groupList', 'projectInfo'])
     }
 }
 </script>
@@ -181,6 +212,13 @@ export default {
 
     .update-project-form {
         width: 340px;
+    }
+
+    .btn {
+        width: 100px;
+    }
+    .deleteProject-btn {
+        margin-left: 20px;
     }
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
     <div class="group-member">
         <div class="title">
-            <div class="member-count">人数：共 {{groupMemberList.length}} 人</div>
+            <div class="member-count">人数：共 {{groupMember.length}} 人</div>
             <Button type="primary" v-if="isAdminOrLeader" @click="goAddMember">添加组成员</Button>
         </div>
 
@@ -42,12 +42,11 @@
 
 <script>
 import {
-    getGroupMember,
     setGroupMemberRole,
     deleteGroupMember
 } from '@/services/index'
 import { Icon, Dropdown, DropdownMenu, DropdownItem } from 'iview'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
     name: 'GroupMember',
@@ -65,15 +64,11 @@ export default {
         DropdownItem
     },
     created() {
-        this.fetchGroupMember()
+        this.fetchGroupMember({ groupId: this.groupId })
     },
 
-    data: () => ({
-        groupMemberList: []
-    }),
-
     computed: {
-        ...mapGetters(['userInfo', 'groupList']),
+        ...mapGetters(['userInfo', 'groupList', 'groupMember']),
 
         // 当前组leader id列表
         groupLeaderIds() {
@@ -85,14 +80,14 @@ export default {
 
         // 当前组leader列表
         groupLeaderList() {
-            return this.groupMemberList.filter(user =>
+            return this.groupMember.filter(user =>
                 this.groupLeaderIds.some(userId => userId === user.userId)
             )
         },
 
         // 当前组开发成员列表
         groupDevList() {
-            return this.groupMemberList.filter(user =>
+            return this.groupMember.filter(user =>
                 this.groupLeaderIds.every(userId => userId !== user.userId)
             )
         },
@@ -107,21 +102,7 @@ export default {
     },
 
     methods: {
-        // 获取组成员
-        async fetchGroupMember() {
-            try {
-                const res = await getGroupMember({ groupId: this.groupId })
-                console.log('getGroupMember', res)
-
-                if (res.code === 0) {
-                    this.groupMemberList = res.data
-                } else {
-                    this.$Message.error(res.msg)
-                }
-            } catch (err) {
-                console.log('getGroupMember err', err)
-            }
-        },
+        ...mapActions(['fetchGroupMember']),
 
         // 跳转到添加组成员
         goAddMember() {
@@ -180,10 +161,10 @@ export default {
                             this.$Modal.remove()
                             this.$Message.info('删除成功')
 
-                            const targetIdx = this.groupMemberList.findIndex(
+                            const targetIdx = this.groupMember.findIndex(
                                 user => user.userId === userId
                             )
-                            this.groupMemberList.splice(targetIdx, 1)
+                            this.groupMember.splice(targetIdx, 1)
                         } else {
                             // 删除失败
                             this.$Modal.remove()

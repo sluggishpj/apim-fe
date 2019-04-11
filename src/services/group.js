@@ -51,6 +51,6 @@ export function deleteGroupMember({ groupId, userId }) {
 }
 
 // 根据组id获取组信息
-export function getGroupInfoById({ groupId }) {
+export function getGroupInfo({ groupId }) {
     return doPost('/group/group-info', { groupId })
 }

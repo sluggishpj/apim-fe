@@ -1,31 +1,79 @@
-import { getGroupList } from '@/services'
+import { getGroupList, getGroupInfo, getGroupMember } from '@/services'
 import { Message } from 'iview'
 
 const state = {
-    groupList: [] // 加入的所有组
+    groupList: [], // 加入的所有组
+    groupInfo: null, // 当前组信息
+    groupMember: [] // 当前组组员
 }
 
 const getters = {
-    groupList: state => state.groupList
+    groupList: state => state.groupList,
+    groupInfo: state => state.groupInfo,
+    groupMember: state => state.groupMember
 }
 
 const actions = {
     // 获取组列表
-    async fetchGroupList({ state, commit, rootState }) {
-        if (state.groupList.length === 0) {
-            // 还没获取过
+    async fetchGroupList({ commit }) {
+        try {
+            const res = await getGroupList()
+            console.log('fetchGroupList', res)
+            if (res.code === 0) {
+                commit('setGroupList', res.data)
+            } else {
+                Message.error(res.msg)
+            }
+        } catch (err) {
+            console.log('fetchGroupList err', err)
+        }
+    },
+
+    // 获取某个组组信息
+    async fetchGroupInfo({ state, commit }, { groupId }) {
+        // 判断组列表中是否存在，不存在则进行获取
+        let groupInfo = state.groupList.find(group => group.groupId === groupId)
+
+        if (!groupInfo) {
+            // 获取
             try {
-                const res = await getGroupList()
-                console.log('fetchGroupList', res)
+                const res = await getGroupInfo({ groupId })
+                console.log('fetchGroupInfo', res)
                 if (res.code === 0) {
-                    // 成功，说明已登录
-                    commit('setGroupList', res.data)
+                    groupInfo = res.data
                 } else {
                     Message.error(res.msg)
                 }
             } catch (err) {
-                console.log('fetchGroupList err', err)
+                console.log('fetchGroupInfo err', err)
             }
+        }
+
+        if (groupInfo) {
+            groupInfo.groupName = groupInfo.groupName || '个人组'
+
+            commit('setGroupInfo', groupInfo)
+            // 修改面包屑
+            commit('setBreadCrumbDesc', {
+                name: 'group',
+                title: `${groupInfo.groupName}`,
+                path: `/group/${groupId}`
+            })
+        }
+    },
+
+    // 获取组员
+    async fetchGroupMember({ commit }, { groupId }) {
+        try {
+            const res = await getGroupMember({ groupId })
+            console.log('fetchGroupMember', res)
+            if (res.code === 0) {
+                commit('setGroupMember', res.data)
+            } else {
+                Message.error(res.msg)
+            }
+        } catch (err) {
+            console.log('fetchGroupMember err', err)
         }
     }
 }
@@ -46,6 +94,15 @@ const mutations = {
     // 添加某个组
     addGroup(state, newGroup) {
         state.groupList.push(newGroup)
+    },
+
+    // 设置当前组信息
+    setGroupInfo(state, info) {
+        state.groupInfo = info
+    },
+
+    setGroupMember(state, list) {
+        state.groupMember = list
     }
 }
 

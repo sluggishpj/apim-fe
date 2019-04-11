@@ -129,7 +129,6 @@ export default {
         handleSubmit() {
             console.log('handleSubmit')
             this.$refs.addMemberForm.validate(async valid => {
-                console.log('valid', valid)
                 if (valid) {
                     const { userId } = this.userList.find(
                         user => user.username === this.addMemberForm.username
@@ -168,15 +167,10 @@ export default {
         // 如果是从从组员信息那里跳转过来的，只展示那个组
         filterGroupList() {
             const groupId = this.addMemberForm.groupId
-            if (this.addMemberForm.groupId === '') {
+            if (groupId === '') {
                 return this.groupList
-            } else {
-                return [
-                    this.groupList.find(
-                        group => group.groupId === this.addMemberForm.groupId
-                    )
-                ]
             }
+            return [this.groupList.find(group => group.groupId === groupId)]
         }
     }
 }

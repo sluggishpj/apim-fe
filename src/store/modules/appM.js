@@ -16,7 +16,7 @@ const mutations = {
     // 设置面包屑描述
     setBreadCrumbDesc(state, { name, title = '', path = '', icon = '' }) {
         // 设置面包屑名相关信息
-        let target = state.breadCrumbDesc[name]
+        const target = state.breadCrumbDesc[name]
         target.icon = icon || target.icon
         target.title = title
         target.path = path
@@ -26,7 +26,7 @@ const mutations = {
     setCurrentBreadCrumb(state, name) {
         const breadNameList = getBreadNameList(name)
         const breadCrumbList = []
-        let desc = state.breadCrumbDesc
+        const desc = state.breadCrumbDesc
 
         breadNameList.forEach(name => {
             breadCrumbList.push(desc[name])

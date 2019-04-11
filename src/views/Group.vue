@@ -55,10 +55,11 @@
 <script>
 // @ is an alias to /src
 import { Split, Card, CellGroup, Cell, Tabs, TabPane } from 'iview'
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 const GroupInfo = () => import('@/components/group/GroupInfo.vue')
 const GroupMember = () => import('@/components/group/GroupMember.vue')
 const ProjectList = () => import('@/components/project/ProjectList.vue')
+
 export default {
     name: 'group',
     props: {
@@ -66,7 +67,13 @@ export default {
     },
 
     created() {
-        this.$store.dispatch('fetchGroupList')
+        this.fetchGroupList()
+        if (this.groupId === '0') {
+            this.goDefaultGroup()
+        } else {
+            console.log('created groupId', this.groupId)
+            this.fetchGroupInfo({ groupId: this.groupId })
+        }
     },
 
     components: {
@@ -89,7 +96,8 @@ export default {
             // 回到主页
             this.goDefaultGroup()
         } else {
-            this.doSetBreadCrumbDesc(groupId)
+            console.log('beforeRouteUpdate groupId', groupId)
+            this.fetchGroupInfo({ groupId })
             if (
                 groupId === this.userInfo.defaultGroup &&
                 this.groupMenu !== 'projectList'
@@ -101,38 +109,12 @@ export default {
         }
     },
 
-    beforeRouteEnter(to, from, next) {
-        const groupId = to.params.groupId
-        if (groupId === '0') {
-            // 回到主页
-            next(vm => {
-                vm.goDefaultGroup()
-            })
-        } else {
-            next(vm => {
-                vm.doSetBreadCrumbDesc(groupId)
-            })
-        }
-    },
-
     computed: {
         ...mapGetters(['userInfo', 'groupList']),
+
         // 是否是个人组
         isSelfGroup() {
             return this.groupId === this.userInfo.defaultGroup
-        },
-        // 默认显示的组信息
-        defaultGroupId() {
-            let groupId = '0'
-            const userInfo = this.userInfo
-            const groupList = this.groupList
-
-            if (userInfo.role === 'admin' && groupList.length) {
-                groupId = groupList[0].groupId
-            } else if (userInfo.role === 'member') {
-                groupId = userInfo.defaultGroup
-            }
-            return { groupId }
         }
     },
 
@@ -143,13 +125,23 @@ export default {
 
     methods: {
         ...mapMutations(['setBreadCrumbDesc']),
+        ...mapActions(['fetchGroupInfo', 'fetchGroupList']),
 
         // 跳转到默认显示的组
         goDefaultGroup() {
+            let groupId = '0'
+            const userInfo = this.userInfo
+            const groupList = this.groupList
+
+            if (userInfo.role === 'admin' && groupList.length) {
+                groupId = groupList[0].groupId
+            } else if (userInfo.role === 'member') {
+                groupId = userInfo.defaultGroup
+            }
             this.$router.replace({
                 name: 'group',
                 params: {
-                    groupId: this.defaultGroupId.groupId
+                    groupId
                 }
             })
         },
@@ -157,22 +149,6 @@ export default {
         // 根据groupId查找目标组
         findTargetGroup(groupId) {
             return this.groupList.find(group => group.groupId === groupId)
-        },
-
-        // 修改当前面包屑描述
-        doSetBreadCrumbDesc(groupId) {
-            const targetGroup = this.findTargetGroup(groupId)
-            let title = ''
-
-            if (targetGroup) {
-                if (!targetGroup.groupName) {
-                    title = '个人组'
-                } else {
-                    title = targetGroup.groupName
-                }
-            }
-
-            this.setBreadCrumbDesc({ name: 'group', title })
         }
     },
 
@@ -182,7 +158,7 @@ export default {
             if (this.groupId === '0') {
                 this.goDefaultGroup()
             } else {
-                this.doSetBreadCrumbDesc(this.groupId)
+                this.fetchGroupInfo({ groupId: this.groupId })
             }
         }
     }
