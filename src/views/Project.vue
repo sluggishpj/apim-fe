@@ -6,7 +6,7 @@ import { mapActions } from 'vuex'
 
 export default {
     props: {
-        projectId: { type: String, required: true }
+        projectId: { type: Number, required: true }
     },
     created() {
         this.fetchProjectInfo({ projectId: this.projectId })

@@ -11,8 +11,8 @@
                                     :key="group.groupId"
                                     :title="`${group.groupName || '个人组'}`"
                                     :label="group.groupDesc"
-                                    :selected="groupId === group.groupId"
-                                    :to="{name: 'group', params: {groupId: group.groupId, title: group.groupName}}"
+                                    :selected="gId === group.groupId"
+                                    :to="{name: 'group', params: {groupId: group.groupId.toString(), title: group.groupName}}"
                                 >
                                     <!-- <Icon slot="extra" type="ios-cube-outline" size="16" /> -->
                                 </Cell>
@@ -25,7 +25,7 @@
                 <div class="group-info-wrapper">
                     <Tabs v-model="groupMenu">
                         <TabPane name="projectList" label="项目列表" icon="md-apps">
-                            <ProjectList :groupId="groupId"/>
+                            <ProjectList :groupId="gId"/>
                         </TabPane>
 
                         <TabPane
@@ -34,16 +34,16 @@
                             label="组成员管理"
                             icon="md-people"
                         >
-                            <GroupMember :groupId="groupId"/>
+                            <GroupMember :groupId="gId"/>
                         </TabPane>
 
                         <TabPane
                             name="groupInfo"
-                            v-if="groupId !== userInfo.defaultGroup"
+                            v-if="gId !== userInfo.defaultGroup"
                             label="组信息管理"
                             icon="md-settings"
                         >
-                            <GroupInfo :groupId="groupId"/>
+                            <GroupInfo :groupId="gId"/>
                         </TabPane>
                     </Tabs>
                 </div>
@@ -71,8 +71,7 @@ export default {
         if (this.groupId === '0') {
             this.goDefaultGroup()
         } else {
-            console.log('created groupId', this.groupId)
-            this.fetchGroupInfo({ groupId: this.groupId })
+            this.fetchGroupInfo({ groupId: this.gId })
         }
     },
 
@@ -91,12 +90,11 @@ export default {
     beforeRouteUpdate(to, from, next) {
         // 如果跳到个人组，则判断当前的 groupMenu 是否在项目列表
         // 不是的话则切换到项目列表
-        const groupId = to.params.groupId
-        if (groupId === '0') {
+        const groupId = Number(to.params.groupId)
+        if (groupId === 0) {
             // 回到主页
             this.goDefaultGroup()
         } else {
-            console.log('beforeRouteUpdate groupId', groupId)
             this.fetchGroupInfo({ groupId })
             if (
                 groupId === this.userInfo.defaultGroup &&
@@ -114,7 +112,11 @@ export default {
 
         // 是否是个人组
         isSelfGroup() {
-            return this.groupId === this.userInfo.defaultGroup
+            return this.gId === this.userInfo.defaultGroup
+        },
+
+        gId() {
+            return Number(this.groupId)
         }
     },
 
@@ -129,7 +131,7 @@ export default {
 
         // 跳转到默认显示的组
         goDefaultGroup() {
-            let groupId = '0'
+            let groupId = 0
             const userInfo = this.userInfo
             const groupList = this.groupList
 
@@ -141,24 +143,19 @@ export default {
             this.$router.replace({
                 name: 'group',
                 params: {
-                    groupId
+                    groupId: groupId.toString()
                 }
             })
-        },
-
-        // 根据groupId查找目标组
-        findTargetGroup(groupId) {
-            return this.groupList.find(group => group.groupId === groupId)
         }
     },
 
     watch: {
         groupList() {
             // 获取到组列表后
-            if (this.groupId === '0') {
+            if (this.gId === 0) {
                 this.goDefaultGroup()
             } else {
-                this.fetchGroupInfo({ groupId: this.groupId })
+                this.fetchGroupInfo({ groupId: this.gId })
             }
         }
     }

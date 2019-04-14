@@ -41,10 +41,7 @@
 </template>
 
 <script>
-import {
-    setGroupMemberRole,
-    deleteGroupMember
-} from '@/services/index'
+import { setGroupMemberRole, deleteGroupMember } from '@/services/index'
 import { Icon, Dropdown, DropdownMenu, DropdownItem } from 'iview'
 import { mapGetters, mapActions } from 'vuex'
 
@@ -52,8 +49,8 @@ export default {
     name: 'GroupMember',
     props: {
         groupId: {
-            type: String,
-            default: ''
+            type: Number,
+            required: true
         }
     },
 
@@ -64,7 +61,9 @@ export default {
         DropdownItem
     },
     created() {
-        this.fetchGroupMember({ groupId: this.groupId })
+        if (this.groupId !== 0) {
+            this.fetchGroupMember({ groupId: this.groupId })
+        }
     },
 
     computed: {
@@ -181,6 +180,7 @@ export default {
 
         // 更改角色
         async changeRole({ userId, role }) {
+            userId = Number(userId)
             try {
                 const res = await setGroupMemberRole({
                     userId,
@@ -215,8 +215,8 @@ export default {
     },
 
     watch: {
-        groupId() {
-            this.fetchGroupMember()
+        groupId(gId) {
+            this.fetchGroupMember({ groupId: gId })
         }
     }
 }

@@ -57,7 +57,7 @@ export default {
     name: 'ProjectMember',
     props: {
         projectId: {
-            type: String,
+            type: Number,
             required: true
         },
         projectInfo: {

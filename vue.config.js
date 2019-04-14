@@ -1,4 +1,6 @@
 const path = require('path')
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin')
+
 module.exports = {
     outputDir: path.resolve(__dirname, '../apim-be/public'),
     devServer: {
@@ -9,5 +11,8 @@ module.exports = {
                 // target: 'http://yapi.demo.qunar.com/mock/55227'
             }
         }
+    },
+    configureWebpack: {
+        plugins: [new MonacoWebpackPlugin()]
     }
 }

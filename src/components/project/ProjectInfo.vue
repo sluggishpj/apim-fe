@@ -63,7 +63,7 @@ export default {
     name: 'ProjectInfo',
     props: {
         projectId: {
-            type: String,
+            type: Number,
             required: true
         }
     },

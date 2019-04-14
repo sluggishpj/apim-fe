@@ -11,8 +11,13 @@ export function register({ username, password }) {
 }
 
 // 获取个人相关信息
-export function getUserInfo() {
-    return doPost('/user/info')
+export function getSelfInfo() {
+    return doPost('/user/self-info')
+}
+
+// 获取某用户公开信息
+export function getUserInfo(userId) {
+    return doPost('/user/user-info', { userId })
 }
 
 // 修改用户名

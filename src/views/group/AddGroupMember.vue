@@ -72,19 +72,11 @@ export default {
     },
 
     data() {
-        const validateGroupName = (rule, value, callback) => {
-            if (value.trim() === '') {
-                callback(new Error('组名不能为空'))
-            } else {
-                callback()
-            }
-        }
-
-        const validateMember = (rule, value, callback) => {
+        const validateUsername = (rule, value, callback) => {
             this.$set(this.addMemberForm, 'username', value.trim())
             if (value.trim() === '') {
                 callback(new Error('用户名不能为空'))
-            } else if (value.trim().length > 20) {
+            } else if (value.trim().length > 50) {
                 callback(new Error('用户名名字数不能超过20'))
             } else {
                 callback()
@@ -96,8 +88,8 @@ export default {
                 username: ''
             },
             addRules: {
-                groupId: [{ validator: validateGroupName, trigger: 'blur' }],
-                username: [{ validator: validateMember, trigger: 'blur' }]
+                groupId: [{ required: true, type: 'number', trigger: 'blur', message: '组名不能为空' }],
+                username: [{ required: true, validator: validateUsername, trigger: 'blur' }]
             },
             tipsList: [],
             userList: [],

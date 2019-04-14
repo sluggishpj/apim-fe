@@ -3,7 +3,8 @@
         <h2 class="title">用户信息</h2>
         <BaseEdit
             :label="'用户名：'"
-            :val="userInfo.username"
+            :val="targetUserInfo.username"
+            :canEdit="isSelf"
             v-model="isShowUsername"
             @cancel="handleCancel"
             @confirm="handleConfirm"
@@ -15,7 +16,7 @@
 // @ is an alias to /src
 import BaseEdit from '@/components/BaseEdit.vue'
 import { mapGetters } from 'vuex'
-import { updateUsername } from '@/services/index'
+import { updateUsername, getUserInfo } from '@/services/index'
 
 export default {
     name: 'user-info',
@@ -25,15 +26,39 @@ export default {
     props: {
         userId: {
             type: String,
-            default: '0'
+            required: true
         }
+    },
+    created() {
+        const { userId } = this.userInfo
+        if (userId) {
+            if (userId === Number(this.userId)) {
+                this.targetUserInfo = this.userInfo
+            } else {
+                this.fetchUserInfo(this.userId)
+            }
+        }
+    },
+    beforeRouteUpdate(to, from, next) {
+        const { userId } = this.userInfo
+        console.log('userId', userId)
+        if (userId === Number(to.params.userId)) {
+            this.targetUserInfo = this.userInfo
+        } else {
+            this.fetchUserInfo(to.params.userId)
+        }
+        next()
     },
     data: () => ({
         isShowUsername: true,
-        isLoading: false
+        isLoading: false,
+        targetUserInfo: {}
     }),
     computed: {
-        ...mapGetters(['userInfo'])
+        ...mapGetters(['userInfo']),
+        isSelf() {
+            return Number(this.userId) === this.userInfo.userId
+        }
     },
     methods: {
         handleCancel() {
@@ -55,6 +80,30 @@ export default {
                     this.$Message.error(res.msg)
                 }
                 this.isLoading = false
+            }
+        },
+        // 获取某个用户公开信息
+        async fetchUserInfo(userId) {
+            try {
+                const res = await getUserInfo(userId)
+                console.log('fetchUserInfo res', res)
+                if (res.code === 0) {
+                    this.targetUserInfo = res.data
+                } else {
+                    this.$Message.error(res.msg)
+                    res.data = {}
+                }
+            } catch (err) {
+                console.log('fetchUserInfo err', err)
+            }
+        }
+    },
+    watch: {
+        userInfo(info) {
+            if (info.userId === Number(this.userId)) {
+                this.targetUserInfo = info
+            } else {
+                this.fetchUserInfo(this.userId)
             }
         }
     }

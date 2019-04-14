@@ -3,7 +3,7 @@
         <div class="show-mode" v-if="value">
             <span class="label">{{label}}</span>
             <span class="show-text">{{val}}</span>
-            <span class="btn edit-btn" @click="edit">修改</span>
+            <span v-if="canEdit" class="btn edit-btn" @click="edit">修改</span>
         </div>
 
         <div class="edit-mode" v-if="!value">
@@ -42,6 +42,10 @@ export default {
         label: {
             type: String,
             default: ''
+        },
+        canEdit: {
+            type: Boolean,
+            default: true
         }
     },
     mounted() {

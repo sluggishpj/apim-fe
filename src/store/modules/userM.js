@@ -1,4 +1,4 @@
-import { getUserInfo } from '@/services'
+import { getSelfInfo } from '@/services'
 import { Message } from 'iview'
 
 const state = {
@@ -16,16 +16,16 @@ const getters = {
 
 const actions = {
     // 获取用户信息
-    async fetchUserInfo({ commit }) {
+    async fetchSelfInfo({ commit }) {
         try {
-            const res = await getUserInfo()
-            console.log('fetchUserInfo', res)
+            const res = await getSelfInfo()
+            console.log('fetchSelfInfo', res)
             if (res.code === 0) {
                 // 成功，说明已登录
                 commit('setUserInfo', res.data)
             }
         } catch (err) {
-            console.log('fetchUserInfo 服务器出错了', err)
+            console.log('fetchSelfInfo 服务器出错了', err)
             Message.error('服务器出错了')
         }
     }

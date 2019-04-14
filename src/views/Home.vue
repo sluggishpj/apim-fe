@@ -97,10 +97,14 @@ export default {
 
         // 跳转到用户详情
         goUserInfo() {
-            if (this.$route.name !== 'user-info') {
+            const userId = `${this.userInfo.userId}`
+            if (
+                this.$route.name !== 'user-info' ||
+                this.$route.params.userId !== userId
+            ) {
                 this.$router.push({
                     name: 'user-info',
-                    params: { userId: this.userInfo.userId }
+                    params: { userId }
                 })
             }
         }

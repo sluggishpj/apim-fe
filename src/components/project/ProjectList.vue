@@ -28,15 +28,17 @@ export default {
     name: 'ProjectList',
     props: {
         groupId: {
-            type: String,
-            default: ''
+            type: Number,
+            required: true
         }
     },
     components: {
         Icon
     },
     created() {
-        this.fetchProjectList()
+        if (this.groupId !== 0) {
+            this.fetchProjectList()
+        }
     },
     data: () => ({
         projectList: []

@@ -30,6 +30,7 @@
                 <Button
                     class="btn"
                     type="primary"
+                    :loading="loading"
                     @click="handleSubmit('userForm')"
                 >{{type==='login'?'登录':'注册'}}</Button>
             </FormItem>
@@ -102,15 +103,10 @@ export default {
                     }
                 ]
             },
-            type: 'login' // 默认进行登录
+            type: 'login', // 默认进行登录
+            loading: false
         }
     },
-    // beforeRouteEnter(to, from, next) {
-    //     if(from.name !== null) {
-    //         window.location.reload()
-    //     }
-    //     next()
-    // },
     methods: {
         goLogin() {
             if (this.type === 'register') {
@@ -126,6 +122,7 @@ export default {
             this.$refs[name].validate(valid => {
                 if (valid) {
                     // 数据格式正确
+                    this.loading = true
                     if (this.type === 'login') {
                         this.doLogin()
                     } else if (this.type === 'register') {
@@ -139,25 +136,35 @@ export default {
 
         async doLogin() {
             const { username, password } = this.userForm
-            const res = await login({ username, password })
-            console.log('login res', res)
-            if (res.code === 0) {
-                this.$Message.success('登录成功！')
-                this.$store.commit('setUserInfo', res.data)
-            } else {
-                this.$Message.error(res.msg)
+            try {
+                const res = await login({ username, password })
+                console.log('login res', res)
+                if (res.code === 0) {
+                    this.$Message.success('登录成功！')
+                    this.$store.commit('setUserInfo', res.data)
+                } else {
+                    this.$Message.error(res.msg)
+                }
+            } catch (err) {
+                console.log('login err', err)
             }
+            this.loading = false
         },
         async doRegister() {
             const { username, password } = this.userForm
-            const res = await register({ username, password })
-            console.log('register res', res)
-            if (res.code === 0) {
-                this.$Message.success('注册成功！')
-                this.$store.commit('setUserInfo', res.data)
-            } else {
-                this.$Message.error(res.msg)
+            try {
+                const res = await register({ username, password })
+                console.log('register res', res)
+                if (res.code === 0) {
+                    this.$Message.success('注册成功！')
+                    this.$store.commit('setUserInfo', res.data)
+                } else {
+                    this.$Message.error(res.msg)
+                }
+            } catch (err) {
+                console.log('register err', err)
             }
+            this.loading = false
         }
     }
 }

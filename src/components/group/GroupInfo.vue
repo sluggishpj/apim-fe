@@ -4,6 +4,7 @@
             v-if="groupObj"
             :label="'组名：'"
             :val="groupObj.groupName"
+            :canEdit="!isSelfGroup"
             v-model="isShowGroupName"
             @confirm="confirmGroupName"
         />
@@ -14,6 +15,7 @@
             v-if="groupObj"
             :label="'组描述：'"
             :val="groupObj.groupDesc"
+            :canEdit="!isSelfGroup"
             v-model="isShowGroupDesc"
             @confirm="confirmGroupDesc"
         />
@@ -40,8 +42,8 @@ export default {
     },
     props: {
         groupId: {
-            type: String,
-            default: ''
+            type: Number,
+            required: true
         }
     },
     data: () => ({
@@ -59,6 +61,11 @@ export default {
                     )) ||
                 []
             )
+        },
+
+        // 是否是个人组
+        isSelfGroup() {
+            return this.groupId === this.userInfo.defaultGroup
         }
     },
     methods: {

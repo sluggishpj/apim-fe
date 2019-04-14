@@ -7,7 +7,7 @@
 import { mapGetters } from 'vuex'
 export default {
     created() {
-        this.$store.dispatch('fetchUserInfo')
+        this.$store.dispatch('fetchSelfInfo')
     },
     computed: {
         ...mapGetters(['userInfo']),

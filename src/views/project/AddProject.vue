@@ -59,8 +59,7 @@ export default {
     name: 'add-project',
     props: {
         groupId: {
-            type: String,
-            default: ''
+            type: Number
         }
     },
     components: {
@@ -105,7 +104,7 @@ export default {
 
         const validateBasePath = (rule, value, callback) => {
             if (value.indexOf('/') !== 0) {
-                this.$set(this.addProjectForm, 'basePath', '/' + value.trim())
+                this.$set(this.addProjectForm, 'basePath', `/${value.trim()}`)
             }
             if (value.trim().length > 100) {
                 callback(new Error('字数不能超过100'))
@@ -131,7 +130,7 @@ export default {
                     { validator: validateProjectDesc, trigger: 'blur' }
                 ],
                 groupId: [
-                    { required: true, message: '请选择组', trigger: 'change' }
+                    { required: true, type: 'number', message: '请选择组', trigger: 'change' }
                 ],
                 projectType: [
                     { required: true, message: '请选择权限', trigger: 'change' }
@@ -145,15 +144,13 @@ export default {
         // 如果是从从项目列表那里跳转过来的，只展示那个组
         filterGroupList() {
             const groupId = this.addProjectForm.groupId
-            if (this.addProjectForm.groupId === '') {
+            if (groupId === '') {
                 return this.groupList
-            } else {
-                return [
-                    this.groupList.find(
-                        group => group.groupId === this.addProjectForm.groupId
-                    )
-                ]
             }
+            const targetGroup = this.groupList.find(
+                group => group.groupId === groupId
+            )
+            return targetGroup && [targetGroup]
         }
     },
     methods: {
