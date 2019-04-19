@@ -69,8 +69,10 @@ export default {
     created() {
         this.fetchGroupList()
         if (this.groupId === '0') {
+            console.log('created goDefaultGroup')
             this.goDefaultGroup()
         } else {
+            console.log('created fetchGroupInfo')
             this.fetchGroupInfo({ groupId: this.gId })
         }
     },
@@ -134,18 +136,19 @@ export default {
             let groupId = 0
             const userInfo = this.userInfo
             const groupList = this.groupList
-
-            if (userInfo.role === 'admin' && groupList.length) {
-                groupId = groupList[0].groupId
-            } else if (userInfo.role === 'member') {
-                groupId = userInfo.defaultGroup
-            }
-            this.$router.replace({
-                name: 'group',
-                params: {
-                    groupId: groupId.toString()
+            if (userInfo.username) {
+                if (userInfo.role === 'admin' && groupList.length) {
+                    groupId = groupList[0].groupId
+                } else if (userInfo.role === 'member') {
+                    groupId = userInfo.defaultGroup
                 }
-            })
+                this.$router.replace({
+                    name: 'group',
+                    params: {
+                        groupId: groupId.toString()
+                    }
+                })
+            }
         }
     },
 

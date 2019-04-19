@@ -1,3 +1,5 @@
 export * from './user'
 export * from './group'
 export * from './project'
+export * from './interface'
+export * from './interfaceCat'

@@ -88,6 +88,7 @@ export default {
 
         goProjectInfo(projectId) {
             // 跳转到project的接口页
+            projectId = `${projectId}`
             this.$router.push({ name: 'project', params: { projectId } })
         }
     },

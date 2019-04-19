@@ -16,7 +16,7 @@ export function getSelfInfo() {
 }
 
 // 获取某用户公开信息
-export function getUserInfo(userId) {
+export function getUserInfo({ userId }) {
     return doPost('/user/user-info', { userId })
 }
 

@@ -31,7 +31,9 @@ module.exports = {
         'function-paren-newline': 0,
         'default-case': 0,
         'max-len': 0,
-        'prefer-destructuring': 0
+        'prefer-destructuring': 0,
+        'no-plusplus': 0,
+        'no-underscore-dangle': 0
     },
     parserOptions: {
         parser: 'babel-eslint'

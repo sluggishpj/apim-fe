@@ -192,4 +192,9 @@ export default {
 .ivu-breadcrumb a {
     color: #fff;
 }
+
+// 树形组件
+.ivu-tree ul {
+    font-size: 14px !important;
+}
 </style>

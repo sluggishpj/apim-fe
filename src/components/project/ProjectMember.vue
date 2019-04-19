@@ -9,7 +9,7 @@
             <div class="member" v-for="member in userList" :key="member.userId">
                 <div class="username">
                     <router-link
-                        :to="{name: 'user-info', params: {userId: member.userId}}"
+                        :to="{name: 'user-info', params: {userId: `${member.userId}`}}"
                     >{{member.username}}</router-link>
                 </div>
 
@@ -137,25 +137,26 @@ export default {
         // 处理菜单点击事件
         handleMenuClick(val) {
             const [operator, userId] = val.split(',')
+            const projectId = Number(this.projectId)
             switch (operator) {
                 case 'deleteMember':
-                    this.deleteMember(userId)
+                    this.deleteMember(userId, projectId)
                     break
                 case 'setLeader':
-                    this.setLeader(userId)
+                    this.setLeader(userId, projectId)
                     break
                 case 'setMember':
-                    this.setMember(userId)
+                    this.setMember(userId, projectId)
                     break
             }
         },
 
         // 删除项目成员
-        async deleteMember(userId) {
+        async deleteMember(userId, projectId) {
             try {
                 const res = await deleteProjectMember({
                     userId,
-                    projectId: this.projectId
+                    projectId
                 })
                 console.log('deleteMember', res)
 
@@ -171,19 +172,19 @@ export default {
         },
 
         // 设置为项目负责人
-        setLeader(userId) {
+        setLeader(userId, projectId) {
             this.doSetProjectMemberRole({
                 userId,
-                projectId: this.projectId,
+                projectId,
                 role: 'leader'
             })
         },
 
         // 设置为普通成员
-        setMember(userId) {
+        setMember(userId, projectId) {
             this.doSetProjectMemberRole({
                 userId,
-                projectId: this.projectId,
+                projectId,
                 role: 'member'
             })
         },

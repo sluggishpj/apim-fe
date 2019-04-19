@@ -142,7 +142,6 @@ export default {
 
         // 删除组成员
         deleteMember(userId) {
-            console.log('deleteMember')
             this.$Modal.confirm({
                 title: '警告',
                 content: '<h3>确定删除该成员？</h3>',
@@ -171,8 +170,7 @@ export default {
                         }
                     } catch (err) {
                         this.$Modal.remove()
-                        console.log('deleteGroup err', err)
-                        this.$Message.error('出错了')
+                        console.log('deleteGroupMember err', err)
                     }
                 }
             })
