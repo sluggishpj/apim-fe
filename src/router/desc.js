@@ -6,7 +6,8 @@ const breadCrumbLevel = {
     'add-group-member': { parent: 'home' },
     project: { parent: 'group' },
     'add-project': { parent: 'home' },
-    'add-project-member': { parent: 'project' }
+    'add-project-member': { parent: 'project' },
+    interface: { parent: 'project', hide: true }
 }
 
 // 路由描述对象
@@ -27,15 +28,19 @@ Object.keys(breadCrumbLevel).forEach(key => {
     desc.title = desc.title || ''
     desc.path = desc.path || ''
     desc.icon = desc.icon || ''
+    desc.hide = !!desc.hide
 })
 
 // 获取面包屑对应的路由名列表
 function getBreadNameList(name) {
     const res = []
     while (name) {
-        if (breadCrumbLevel[name]) {
-            res.unshift(name)
-            name = breadCrumbLevel[name].parent
+        const level = breadCrumbLevel[name]
+        if (level) {
+            if (!level.hide) {
+                res.unshift(name)
+            }
+            name = level.parent
         } else {
             break
         }

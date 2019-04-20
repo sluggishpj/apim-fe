@@ -3,11 +3,13 @@
         <div class="project-info-wrapper">
             <Tabs v-model="projectMenu">
                 <TabPane name="apiList" label="接口" icon="md-apps">
-                    <InterfaceList
-                        v-if="projectId"
-                        :projectInfo="projectInfo"
-                        :projectId="projectId"
-                    />
+                    <keep-alive>
+                        <router-view
+                            v-if="projectId"
+                            :projectInfo="projectInfo"
+                            :projectId="projectId"
+                        ></router-view>
+                    </keep-alive>
                 </TabPane>
 
                 <TabPane name="projectMember" label="项目成员管理" icon="md-people">
@@ -36,11 +38,10 @@ import { mapGetters } from 'vuex'
 
 const ProjectInfo = () => import('@/components/project/ProjectInfo.vue')
 const ProjectMember = () => import('@/components/project/ProjectMember.vue')
-const InterfaceList = () => import('@/components/interface/InterfaceList.vue')
 
 export default {
     name: 'project-home',
-    components: { Tabs, TabPane, ProjectInfo, ProjectMember, InterfaceList },
+    components: { Tabs, TabPane, ProjectInfo, ProjectMember },
 
     data: () => ({
         projectMenu: 'apiList'

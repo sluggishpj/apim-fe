@@ -11,7 +11,7 @@ const getters = {
 
 const actions = {
     // 获取某个项目信息
-    async fetchProjectInfo({ state, commit, dispatch, rootState }, { projectId }) {
+    async fetchProjectInfo({ commit, dispatch, rootState }, { projectId }) {
         try {
             const res = await getProjectInfo({ projectId })
             console.log('fetchProjectInfo', res)

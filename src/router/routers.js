@@ -9,6 +9,7 @@ const AddGroup = () => import('@/views/group/AddGroup.vue')
 const AddProject = () => import('@/views/project/AddProject.vue')
 const AddGroupMember = () => import('@/views/group/AddGroupMember.vue')
 const AddProjectMember = () => import('@/views/project/AddProjectMember.vue')
+const InterfaceList = () => import('@/views/interface/InterfaceList.vue')
 
 export default [
     {
@@ -49,7 +50,16 @@ export default [
                     {
                         path: '',
                         name: 'project',
-                        component: ProjectHome
+                        component: ProjectHome,
+                        redirect: 'interface/0',
+                        children: [
+                            {
+                                path: 'interface/:interfaceId',
+                                name: 'interface',
+                                component: InterfaceList,
+                                props: true
+                            }
+                        ]
                     },
                     {
                         path: 'add-project-member',

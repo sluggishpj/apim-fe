@@ -5,6 +5,11 @@ export function addApi({ catId, name, method, path, projectId }) {
     return doPost('/interface/add', { catId, name, method, path, projectId })
 }
 
+// 获取接口详情
+export function getApi({ interfaceId }) {
+    return doPost('/interface/get', { interfaceId })
+}
+
 // 修改接口
 export function updateApi({
     interfaceId,

@@ -7,6 +7,7 @@
             </div>
             <CustomTree
                 :treeContent="catList"
+                :selectedItem="selectedItem"
                 @appendChild="showAddApi"
                 @removeParent="removeCat"
                 @removeChild="removeApi"
@@ -15,18 +16,24 @@
         </div>
 
         <!-- 添加分类弹窗 -->
-        <AddCat v-model="isShowAddCat" :projectId="projectId" @success="fetchCatAndApiInfo"/>
+        <AddCat
+            v-model="isShowAddCat"
+            :projectId="Number(projectId)"
+            @success="fetchCatAndApiInfo"
+        />
 
         <!-- 添加接口弹窗 -->
         <AddInterface
             v-if="catData.name"
             v-model="isShowAddApi"
-            :projectId="projectId"
+            :projectId="Number(projectId)"
             :catData="catData"
             @success="fetchCatAndApiInfo"
         />
 
-        <div class="right-content">右边内容</div>
+        <div class="right-content">
+            <InterfaceInfo :projectId="Number(projectId)" :interfaceId="Number(interfaceId)"/>
+        </div>
     </div>
 </template>
 <script>
@@ -34,16 +41,19 @@ import { getCatAndApiInfo, deleteCat, deleteApi } from '@/services'
 const CustomTree = () => import('@/components/CustomTree.vue')
 const AddCat = () => import('@/components/interfaceCat/AddCat.vue')
 const AddInterface = () => import('@/components/interface/AddInterface.vue')
+const InterfaceInfo = () => import('@/components/interface/InterfaceInfo.vue')
 
 export default {
     name: 'InterfaceList',
     components: {
         CustomTree,
         AddCat,
-        AddInterface
+        AddInterface,
+        InterfaceInfo
     },
     props: {
-        projectId: { type: Number, required: true },
+        projectId: { type: String, required: true },
+        interfaceId: { type: String, required: true },
         projectInfo: {
             type: Object,
             required: true
@@ -62,13 +72,56 @@ export default {
             isShowAddCat: false,
             // 显示添加接口提示框
             isShowAddApi: false,
-            catData: {}
+            catData: {},
+            // 选中的那一项的引用
+            selectedItem: {},
+            // 父结点
+            parentItem: {}
         }
+    },
+    beforeRouteUpdate(to, from, next) {
+        console.log('beforeRouteUpdate')
+        const interfaceId = Number(to.params.interfaceId)
+        if (interfaceId === this.selectedItem._id) {
+            // 说明是点击树形图切换的
+        } else {
+            // 浏览器前进后退切换的，需更新 selectItem
+            this.selectedItem = this.getSelectedItem(interfaceId, this.catList)
+            this.$set(this.parentItem, 'expand', true)
+        }
+        next()
     },
     methods: {
         // 点击某个api
         handleApiChange(item) {
             console.log('handleApiChange', item)
+            this.selectedItem = item
+            this.$router.push({
+                name: 'interface',
+                params: { interfaceId: `${item._id}` }
+            })
+        },
+
+        getSelectedItem(interfaceId, catAndApiInfo) {
+            let targetApi = {}
+            for (let i = 0, len = catAndApiInfo.length; i < len; i++) {
+                const api = catAndApiInfo[i]
+                if (!api.children) {
+                    // 说明是接口
+                    if (api._id === Number(interfaceId)) {
+                        targetApi = api
+                        break
+                    }
+                } else {
+                    // 说明是分类
+                    this.parentItem = api
+                    targetApi = this.getSelectedItem(interfaceId, api.children)
+                    if (targetApi && targetApi.name) {
+                        break
+                    }
+                }
+            }
+            return targetApi
         },
 
         // 添加api
@@ -148,7 +201,7 @@ export default {
         async fetchCatAndApiInfo() {
             try {
                 const res = await getCatAndApiInfo({
-                    projectId: this.projectId
+                    projectId: Number(this.projectId)
                 })
                 console.log('fetchCatAndApiInfo', res)
 
@@ -158,6 +211,11 @@ export default {
                         cat.children = cat.children || []
                     })
                     this.catList = catList
+                    this.selectedItem = this.getSelectedItem(
+                        this.interfaceId,
+                        catList
+                    )
+                    this.$set(this.parentItem, 'expand', true)
                 }
             } catch (err) {
                 console.log('fetchCatAndApiInfo err', err)
@@ -170,6 +228,7 @@ export default {
 .interface-list {
     display: flex;
     .left-side-bar {
+        overflow: hidden;
         flex: 1;
         box-sizing: border-box;
         border-right: 1px solid #ccc;
@@ -185,7 +244,6 @@ export default {
     }
     .right-content {
         flex: 5;
-        background: #ccc;
     }
 }
 </style>

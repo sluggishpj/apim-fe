@@ -85,7 +85,7 @@ export default {
         // 获取某个用户公开信息
         async fetchUserInfo(userId) {
             try {
-                const res = await getUserInfo({userId})
+                const res = await getUserInfo({ userId })
                 console.log('fetchUserInfo res', res)
                 if (res.code === 0) {
                     this.targetUserInfo = res.data

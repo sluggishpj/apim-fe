@@ -21,6 +21,10 @@ export default {
         treeContent: {
             type: Array,
             required: true
+        },
+        selectedItem: {
+            type: Object,
+            required: true
         }
     },
     data: () => ({
@@ -28,7 +32,6 @@ export default {
             type: 'default',
             size: 'small'
         },
-        selectedItem: {},
         hoverItem: null,
         filterTreeContent: []
     }),
@@ -50,7 +53,6 @@ export default {
 
         clickChildHandler(data) {
             if (this.selectedItem !== data) {
-                this.selectedItem = data
                 this.$emit('change', data)
             }
         },
