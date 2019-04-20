@@ -9,6 +9,7 @@
                 :treeContent="catList"
                 @appendChild="showAddApi"
                 @removeParent="removeCat"
+                @removeChild="removeApi"
                 @change="handleApiChange"
             />
         </div>
@@ -29,7 +30,7 @@
     </div>
 </template>
 <script>
-import { getCatAndApiInfo, deleteCat } from '@/services'
+import { getCatAndApiInfo, deleteCat, deleteApi } from '@/services'
 const CustomTree = () => import('@/components/CustomTree.vue')
 const AddCat = () => import('@/components/interfaceCat/AddCat.vue')
 const AddInterface = () => import('@/components/interface/AddInterface.vue')
@@ -83,7 +84,6 @@ export default {
 
         // 删除某个分类
         removeCat(data) {
-            console.log('removeCat', data)
             this.$Modal.confirm({
                 title: '警告',
                 content: `<div>确定删除 <b>${data.name}</b> 分类？</div>`,
@@ -113,10 +113,43 @@ export default {
             })
         },
 
+        // 删除某个接口
+        removeApi(data) {
+            this.$Modal.confirm({
+                title: '警告',
+                content: `<div>确定删除 <b>${data.name}</b> 接口？</div>`,
+                loading: true,
+                onOk: async () => {
+                    try {
+                        const deleteRes = await deleteApi({
+                            interfaceId: data._id
+                        })
+
+                        console.log('removeApi', deleteRes)
+                        if (deleteRes.code === 0) {
+                            // 删除成功
+                            this.$Modal.remove()
+                            this.$Message.info('删除成功')
+                            this.fetchCatAndApiInfo()
+                        } else {
+                            // 删除失败
+                            this.$Modal.remove()
+                            this.$Message.error(deleteRes.msg)
+                        }
+                    } catch (err) {
+                        this.$Modal.remove()
+                        console.log('removeApi err', err)
+                    }
+                }
+            })
+        },
+
         // 获取api和分类信息
         async fetchCatAndApiInfo() {
             try {
-                const res = await getCatAndApiInfo({ projectId: this.projectId })
+                const res = await getCatAndApiInfo({
+                    projectId: this.projectId
+                })
                 console.log('fetchCatAndApiInfo', res)
 
                 if (res.code === 0) {

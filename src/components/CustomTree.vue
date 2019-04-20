@@ -137,6 +137,12 @@ export default {
                     on: {
                         click: () => {
                             this.clickChildHandler(data)
+                        },
+                        mouseenter: () => {
+                            this.handleHover(data)
+                        },
+                        mouseleave: () => {
+                            this.handleHover(null)
                         }
                     }
                 },
@@ -155,7 +161,31 @@ export default {
                                 innerText: data.name || data.title
                             }
                         })
-                    ])
+                    ]),
+                    h(
+                        'span',
+                        {
+                            class: {
+                                'menu-btn': true,
+                                show: this.hoverItem === data // 是否显示按钮
+                            }
+                        },
+                        [
+                            h('Button', {
+                                props: Object.assign({}, this.buttonProps, {
+                                    icon: 'md-trash'
+                                }),
+                                style: {
+                                    width: '32px'
+                                },
+                                on: {
+                                    click: e => {
+                                        this.removeChild(e, data)
+                                    }
+                                }
+                            })
+                        ]
+                    )
                 ]
             )
         },
@@ -172,6 +202,11 @@ export default {
                     this.addParentRender(arr[i].children)
                 }
             }
+        },
+
+        removeChild(e, data) {
+            this.$emit('removeChild', data)
+            e.stopPropagation()
         },
 
         handleHover(data) {
