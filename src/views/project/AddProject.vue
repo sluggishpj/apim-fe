@@ -103,11 +103,22 @@ export default {
         }
 
         const validateBasePath = (rule, value, callback) => {
-            if (value.indexOf('/') !== 0) {
-                this.$set(this.addProjectForm, 'basePath', `/${value.trim()}`)
-            }
-            if (value.trim().length > 100) {
-                callback(new Error('字数不能超过100'))
+            let path = value.trim()
+            if (value.trim() !== '') {
+                // 非空
+                if (path.indexOf('/') !== 0) {
+                    path = `/${path}`
+                }
+                // 以 '/' 结尾，则去掉结尾的 '/'
+                while (path[path.length - 1] === '/') {
+                    path = path.slice(0, path.length - 1)
+                }
+                this.$set(this.updateProjectForm, 'basePath', path)
+                if (path.length > 100) {
+                    callback(new Error('字数不能超过100'))
+                } else {
+                    callback()
+                }
             } else {
                 callback()
             }

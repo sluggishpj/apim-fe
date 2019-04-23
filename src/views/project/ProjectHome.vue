@@ -1,9 +1,9 @@
 <template>
     <div class="project" v-if="projectInfo">
         <div class="project-info-wrapper">
-            <Tabs v-model="projectMenu">
+            <Tabs v-model="projectMenu" name="projectHome">
                 <TabPane name="apiList" label="接口" icon="md-apps">
-                    <keep-alive>
+                    <keep-alive v-if="projectMenu==='apiList'">
                         <router-view
                             v-if="projectId"
                             :projectInfo="projectInfo"

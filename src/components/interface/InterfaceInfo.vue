@@ -1,19 +1,29 @@
 <template>
     <div class="interface-info">
-        <Tabs>
-            <TabPane name="apiList" label="预览" icon="md-eye">
-                <InterfacePreview :apiInfo="apiInfo" :projectId="projectId"/>
+        <Tabs name="interfaceInfo" v-model="interfaceMenu">
+            <TabPane label="预览" tab="interfaceInfo" name="interfacePreview" icon="md-eye">
+                <InterfacePreview
+                    v-if="interfaceMenu==='interfacePreview'"
+                    :apiInfo="apiInfo"
+                    :projectId="projectId"
+                    :basePath="basePath"
+                />
             </TabPane>
 
-            <TabPane name="projectMember" label="编辑" icon="md-build">
-                <InterfaceEdit :apiInfo="apiInfo"/>
+            <TabPane label="编辑" tab="interfaceInfo" name="interfaceEdit" icon="md-build">
+                <InterfaceEdit
+                    v-if="interfaceMenu==='interfaceEdit'"
+                    :catList="catList"
+                    :apiInfo="apiInfo"
+                    :basePath="basePath"
+                />
             </TabPane>
         </Tabs>
     </div>
 </template>
 <script>
 import { Tabs, TabPane } from 'iview'
-import { getApi } from '@/services'
+import { mapGetters, mapActions } from 'vuex'
 const InterfacePreview = () =>
     import('@/components/interface/InterfacePreview.vue')
 const InterfaceEdit = () => import('@/components/interface/InterfaceEdit.vue')
@@ -27,11 +37,15 @@ export default {
         projectId: {
             type: Number,
             required: true
+        },
+        catList: {
+            type: Array,
+            required: true
         }
     },
     components: { Tabs, TabPane, InterfacePreview, InterfaceEdit },
     data: () => ({
-        apiInfo: {} // api 详情
+        interfaceMenu: 'interfacePreview'
     }),
     created() {
         if (this.interfaceId !== 0) {
@@ -39,17 +53,7 @@ export default {
         }
     },
     methods: {
-        async fetchApiInfo(interfaceId) {
-            try {
-                const res = await getApi({ interfaceId })
-                console.log('fetchApiInfo res', res)
-                if (res.code === 0) {
-                    this.apiInfo = res.data
-                }
-            } catch (err) {
-                console.log('fetchApiInfo err', err)
-            }
-        }
+        ...mapActions(['fetchApiInfo'])
     },
     watch: {
         interfaceId(interfaceId) {
@@ -57,8 +61,17 @@ export default {
                 this.fetchApiInfo(interfaceId)
             }
         }
+    },
+    computed: {
+        ...mapGetters(['projectInfo', 'apiInfo']),
+        basePath() {
+            return this.projectInfo.basePath
+        }
     }
 }
 </script>
 <style scoped lang="scss">
+.interface-info {
+    width: 100%;
+}
 </style>

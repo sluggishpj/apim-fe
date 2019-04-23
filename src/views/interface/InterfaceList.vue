@@ -6,6 +6,7 @@
                 <Button :size="'small'" type="primary" @click="showAddCat">添加分类</Button>
             </div>
             <CustomTree
+                class="custom-tree"
                 :treeContent="catList"
                 :selectedItem="selectedItem"
                 @appendChild="showAddApi"
@@ -32,7 +33,7 @@
         />
 
         <div class="right-content">
-            <InterfaceInfo :projectId="Number(projectId)" :interfaceId="Number(interfaceId)"/>
+            <InterfaceInfo :catList="catList" :projectId="Number(projectId)" :interfaceId="Number(interfaceId)"/>
         </div>
     </div>
 </template>
@@ -224,12 +225,13 @@ export default {
     }
 }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .interface-list {
     display: flex;
+    width: 100vw;
     .left-side-bar {
         overflow: hidden;
-        flex: 1;
+        flex: 0 0 20vw;
         box-sizing: border-box;
         border-right: 1px solid #ccc;
         font-size: 16px !important;
@@ -241,9 +243,13 @@ export default {
             align-items: center;
             background: #fedfe1;
         }
+
+        .custom-tree {
+            padding-left: 20px;
+        }
     }
     .right-content {
-        flex: 5;
+        width: 80vw;
     }
 }
 </style>

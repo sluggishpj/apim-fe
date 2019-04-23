@@ -113,15 +113,11 @@ export default {
 </script>
 <style lang="scss">
 .home {
-    display: flex;
     flex-direction: column;
-    min-height: 100vh;
-}
-.main {
-    flex: 1;
+    height: 100vh;
 }
 .header {
-    flex: 0 0 56px;
+    height: 56px;
     display: flex;
     justify-content: space-between;
     border-bottom: 1px solid;
@@ -183,6 +179,10 @@ export default {
     .add-group {
         border-bottom: 1px solid #e8eaec;
     }
+}
+.main {
+    height: calc(100vh - 56px);
+    overflow: auto;
 }
 
 // 面包屑样式

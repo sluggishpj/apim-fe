@@ -8,11 +8,13 @@
             </div>
             <div class="item">
                 <span class="title">接口路径：</span>
-                <span class="val">{{apiInfo.path}}</span>
+                <span class="val">{{`${basePath}${apiInfo.path}`}}</span>
             </div>
             <div class="item">
                 <span class="title">Mock地址：</span>
-                <span class="val">{{`/mock/${projectId}${apiInfo.path}`}}</span>
+                <span class="val">
+                    <a :href="mockPath" target="_blank">{{mockPath}}</a>
+                </span>
             </div>
             <div class="item">
                 <span class="title">创建时间：</span>
@@ -20,9 +22,21 @@
             </div>
         </div>
 
-        <Divider class="heading" orientation="left">返回数据：</Divider>
+        <Divider class="heading" orientation="left">请求参数：</Divider>
+        <monaco-editor
+            class="editor"
+            v-model="reqQuery"
+            language="javascript"
+            :options="{readOnly: true, theme: 'vs-dark', minimap: {enabled: false},  automaticLayout: true, scrollBeyondLastLine: false}"
+        ></monaco-editor>
 
-        <monaco-editor class="editor" v-model="code" language="json" :options="{readOnly: true}"></monaco-editor>
+        <Divider class="heading" orientation="left">返回数据：</Divider>
+        <monaco-editor
+            class="editor"
+            v-model="resBody"
+            language="json"
+            :options="{readOnly: true, theme: 'vs-dark', minimap: {enabled: false},  automaticLayout: true, scrollBeyondLastLine: false}"
+        ></monaco-editor>
     </div>
 </template>
 <script>
@@ -38,25 +52,47 @@ export default {
         projectId: {
             type: Number,
             required: true
+        },
+        basePath: {
+            type: String,
+            required: true
         }
     },
     components: {
         Divider,
         MonacoEditor
     },
-    data: () => ({
-        code: '{\n\t"name": "xpj", \n\t"gender":"boy"\n}'
-    }),
+    data: () => ({}),
+    mounted() {
+        console.log('mounted')
+        // 不允许 JSON 注释，否则报错
+        window.monaco.languages.json.jsonDefaults.diagnosticsOptions.allowComments = false
+    },
     computed: {
         addTime() {
             const date = new Date(this.apiInfo.addTime)
             return `${date.getFullYear()}/${date.getMonth() +
                 1}/${date.getDate()}`
+        },
+        reqQuery() {
+            return this.apiInfo.reqQuery || ''
+        },
+        resBody() {
+            return this.apiInfo.resBody || ''
+        },
+        mockPath() {
+            return `/mock/${this.projectId}${this.basePath}${this.apiInfo.path}`
         }
     }
 }
 </script>
 <style lang="scss" scoped>
+.interface-preview {
+    position: relative;
+    width: 100%;
+    // min-height: 400px;
+}
+
 .heading {
     font-size: 18px;
     font-weight: 400;
@@ -77,11 +113,9 @@ export default {
     }
 }
 .editor {
-    width: 100%;
+    width: 78vw;
     height: 300px;
     text-align: left;
-    border-top: 1px solid #fedfe1;
-    border-bottom: 1px solid #fedfe1;
     margin-bottom: 10px;
 }
 </style>

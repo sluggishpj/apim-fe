@@ -10,7 +10,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "babel-plugin-import": "^1.11.0",
-    "iview": "^3.3.0",
+    "iview": "^3.4.0",
     "monaco-editor-webpack-plugin": "^1.7.0",
     "vue": "^2.6.6",
     "vue-monaco": "^0.3.1",

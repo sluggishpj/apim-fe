@@ -13,6 +13,10 @@ module.exports = {
         }
     },
     configureWebpack: {
-        plugins: [new MonacoWebpackPlugin()]
+        plugins: [
+            new MonacoWebpackPlugin({
+                languages: ['javascript', 'json']
+            })
+        ]
     }
 }
