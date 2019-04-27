@@ -69,10 +69,8 @@ export default {
     created() {
         this.fetchGroupList()
         if (this.groupId === '0') {
-            console.log('created goDefaultGroup')
             this.goDefaultGroup()
         } else {
-            console.log('created fetchGroupInfo')
             this.fetchGroupInfo({ groupId: this.gId })
         }
     },
@@ -94,8 +92,13 @@ export default {
         // 不是的话则切换到项目列表
         const groupId = Number(to.params.groupId)
         if (groupId === 0) {
-            // 回到主页
-            this.goDefaultGroup()
+            if (this.groupList && this.groupList.length > 0) {
+                // 回到主页
+                this.goDefaultGroup()
+            } else {
+                // 管理员初始状态
+                next()
+            }
         } else {
             this.fetchGroupInfo({ groupId })
             if (
@@ -157,8 +160,6 @@ export default {
             // 获取到组列表后
             if (this.gId === 0) {
                 this.goDefaultGroup()
-            } else {
-                this.fetchGroupInfo({ groupId: this.gId })
             }
         }
     }

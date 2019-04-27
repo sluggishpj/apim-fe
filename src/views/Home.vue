@@ -8,9 +8,9 @@
 
             <div class="menu-list">
                 <!-- 搜索 -->
-                <div class="search">
+                <!-- <div class="search">
                     <Input search placeholder="搜索..."/>
-                </div>
+                </div>-->
 
                 <!-- 添加功能 -->
                 <div class="add-menu" v-if="isAdmin">
@@ -30,7 +30,7 @@
                 <div class="self">
                     <Poptip trigger="hover" placement="bottom-end" padding="0px 0px">
                         <div class="avatar">
-                            <img src="http://yapi.demo.qunar.com/api/user/avatar?uid=80629">
+                            <img :src="require('@/assets/images/christiane.jpg')">
                         </div>
                         <div slot="content">
                             <div class="poptip-item person-info" @click="goUserInfo">个人信息</div>
@@ -47,7 +47,7 @@
 
 <script>
 // @ is an alias to /src
-import { Input, Icon, Poptip } from 'iview'
+import { Icon, Poptip } from 'iview'
 import { logout } from '@/services/index'
 import { mapGetters } from 'vuex'
 import CustomBreadCrumb from '@/components/CustomBreadCrumb.vue'
@@ -55,12 +55,10 @@ import CustomBreadCrumb from '@/components/CustomBreadCrumb.vue'
 export default {
     name: 'home',
     components: {
-        Input,
         Icon,
         Poptip,
         CustomBreadCrumb
     },
-    mounted() {},
     computed: {
         ...mapGetters(['userInfo', 'breadCrumbList']),
         isAdmin() {
