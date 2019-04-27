@@ -108,9 +108,14 @@ export default {
             console.log('handleSubmit')
             this.$refs.addMemberForm.validate(async valid => {
                 if (valid) {
-                    const { userId } = this.groupMember.find(
+                    const user = this.groupMember.find(
                         user => user.username === this.addMemberForm.username
                     )
+                    if (!user) {
+                        this.$Message.error('请从列表选择用户')
+                        return
+                    }
+                    const { userId } = user
 
                     try {
                         const res = await addProjectMember({
