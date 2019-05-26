@@ -13,6 +13,7 @@
             <div class="item">
                 <span class="title">Mock地址：</span>
                 <span class="val">
+                    <span class="req-method">{{apiInfo.method && apiInfo.method.toUpperCase()}}</span>
                     <a :href="mockPath" target="_blank">{{mockPath}}</a>
                 </span>
             </div>
@@ -111,6 +112,13 @@ export default {
         font-weight: bold;
         padding-right: 10px;
     }
+}
+.req-method {
+    display: inline-block;
+    margin-right: 5px;
+    padding: 0 5px;
+    background: #0f2540;
+    color: #fff;
 }
 .editor {
     width: 78vw;

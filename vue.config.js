@@ -6,9 +6,11 @@ module.exports = {
     devServer: {
         // 设置代理转发
         proxy: {
-            '/api': {
-                target: 'http://localhost:3001/'
-                // target: 'http://yapi.demo.qunar.com/mock/55227'
+            '/api/*': {
+                target: 'http://localhost:3001'
+            },
+            '/mock/*': {
+                target: 'http://localhost:3001'
             }
         }
     },

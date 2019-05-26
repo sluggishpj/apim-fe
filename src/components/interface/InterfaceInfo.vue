@@ -23,7 +23,7 @@
 </template>
 <script>
 import { Tabs, TabPane } from 'iview'
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions, mapMutations } from 'vuex'
 const InterfacePreview = () =>
     import('@/components/interface/InterfacePreview.vue')
 const InterfaceEdit = () => import('@/components/interface/InterfaceEdit.vue')
@@ -50,15 +50,20 @@ export default {
     created() {
         if (this.interfaceId !== 0) {
             this.fetchApiInfo(this.interfaceId)
+        } else {
+            this.setApiInfo({})
         }
     },
     methods: {
+        ...mapMutations(['setApiInfo']),
         ...mapActions(['fetchApiInfo'])
     },
     watch: {
         interfaceId(interfaceId) {
             if (interfaceId !== 0) {
                 this.fetchApiInfo(interfaceId)
+            } else {
+                this.setApiInfo({})
             }
         }
     },

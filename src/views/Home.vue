@@ -33,7 +33,7 @@
                             <img :src="require('@/assets/images/christiane.jpg')">
                         </div>
                         <div slot="content">
-                            <div class="poptip-item person-info" @click="goUserInfo">个人信息</div>
+                            <div class="poptip-item person-info" @click="goUserInfo">个人信息{{userInfo && `（${userInfo.username}）`}}</div>
                             <div class="poptip-item logout" @click="doLogout">退出</div>
                         </div>
                     </Poptip>
