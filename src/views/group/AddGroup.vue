@@ -3,7 +3,7 @@
         <h2 class="title">新增组</h2>
         <Form ref="addGroupForm" :model="addGroupForm" :rules="groupRules" :label-width="80">
             <FormItem class="add-group-form" prop="groupName" label="组名">
-                <Input v-model="addGroupForm.groupName" placeholder="请输入组名" :maxlength="20"></Input>
+                <Input v-model="addGroupForm.groupName" placeholder="请输入组名" :maxlength="NAME_MAX_LEN"></Input>
             </FormItem>
 
             <FormItem prop="groupDesc" label="组描述">
@@ -12,7 +12,7 @@
                     placeholder="请输入组描述"
                     type="textarea"
                     :autosize="true"
-                    :maxlength="50"
+                    :maxlength="DESC_MAX_LEN"
                 ></Input>
             </FormItem>
 
@@ -28,6 +28,7 @@
 import { Form, FormItem, Input } from 'iview'
 import { addGroup } from '@/services'
 import { mapGetters } from 'vuex'
+import { NAME_MAX_LEN, DESC_MAX_LEN, PATH_MAX_LEN } from '@/constant/len'
 
 export default {
     name: 'add-group',
@@ -41,8 +42,8 @@ export default {
             this.$set(this.addGroupForm, 'groupName', value.trim())
             if (value.trim() === '') {
                 callback(new Error('组名不能为空'))
-            } else if (value.trim().length > 20) {
-                callback(new Error('组名字数不能超过20'))
+            } else if (value.trim().length > NAME_MAX_LEN) {
+                callback(new Error(`组名字数不能超过${NAME_MAX_LEN}`))
             } else {
                 callback()
             }
@@ -50,13 +51,14 @@ export default {
 
         const validateGroupDesc = (rule, value, callback) => {
             this.$set(this.addGroupForm, 'groupDesc', value.trim())
-            if (value.trim().length > 50) {
-                callback(new Error('描述字数不能超过50'))
+            if (value.trim().length > DESC_MAX_LEN) {
+                callback(new Error(`描述字数不能超过${DESC_MAX_LEN}`))
             } else {
                 callback()
             }
         }
         return {
+            NAME_MAX_LEN, DESC_MAX_LEN, PATH_MAX_LEN,
             addGroupForm: {
                 groupName: '',
                 groupDesc: ''

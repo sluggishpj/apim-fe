@@ -17,12 +17,22 @@
                 </Input>
             </FormItem>
             <FormItem prop="password" label="密码">
-                <Input type="password" v-model="userForm.password" placeholder="请输入密码">
+                <Input
+                    type="password"
+                    v-model="userForm.password"
+                    placeholder="请输入密码"
+                    @keyup.enter.native="handleSubmit"
+                >
                     <Icon type="ios-lock-outline" slot="prepend"></Icon>
                 </Input>
             </FormItem>
             <FormItem v-if="type==='register'" prop="repeatPass" label="重复密码">
-                <Input type="password" v-model="userForm.repeatPass" placeholder="请重复输入密码">
+                <Input
+                    type="password"
+                    v-model="userForm.repeatPass"
+                    placeholder="请重复输入密码"
+                    @keyup.enter.native="handleSubmit"
+                >
                     <Icon type="ios-lock-outline" slot="prepend"></Icon>
                 </Input>
             </FormItem>
@@ -31,7 +41,7 @@
                     class="btn"
                     type="primary"
                     :loading="loading"
-                    @click="handleSubmit('userForm')"
+                    @click="handleSubmit"
                 >{{type==='login'?'登录':'注册'}}</Button>
             </FormItem>
         </Form>
@@ -40,6 +50,7 @@
 <script>
 import { login, register } from '@/services'
 import { Form, FormItem, Input, Icon } from 'iview'
+import { NAME_MAX_LEN, PASS_MAX_LEN } from '@/constant/len'
 
 export default {
     name: 'Login',
@@ -53,8 +64,8 @@ export default {
         const validateUserName = (rule, value, callback) => {
             if (value.trim() === '') {
                 callback(new Error('用户名不能为空'))
-            } else if (value.trim().length > 50) {
-                callback(new Error('用户名长度不能超过50'))
+            } else if (value.trim().length > NAME_MAX_LEN) {
+                callback(new Error(`用户名长度不能超过${NAME_MAX_LEN}`))
             } else {
                 callback()
             }
@@ -63,8 +74,8 @@ export default {
         const validatePass = (rule, value, callback) => {
             if (value.trim() === '') {
                 callback(new Error('密码不能为空'))
-            } else if (value.trim().length > 20) {
-                callback(new Error('密码长度不能超过20'))
+            } else if (value.trim().length > PASS_MAX_LEN) {
+                callback(new Error(`密码长度不能超过${PASS_MAX_LEN}`))
             } else {
                 if (
                     this.type === 'register' &&
@@ -118,8 +129,8 @@ export default {
                 this.type = 'register'
             }
         },
-        handleSubmit(name) {
-            this.$refs[name].validate(valid => {
+        handleSubmit() {
+            this.$refs.userForm.validate(valid => {
                 if (valid) {
                     // 数据格式正确
                     this.loading = true

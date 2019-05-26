@@ -41,6 +41,7 @@
 import { Form, FormItem, AutoComplete, Select, Option } from 'iview'
 import { addGroupMember, getAllUser } from '@/services'
 import { mapGetters } from 'vuex'
+import { NAME_MAX_LEN } from '@/constant/len'
 
 export default {
     name: 'add-group-member',
@@ -76,8 +77,8 @@ export default {
             this.$set(this.addMemberForm, 'username', value.trim())
             if (value.trim() === '') {
                 callback(new Error('用户名不能为空'))
-            } else if (value.trim().length > 50) {
-                callback(new Error('用户名名字数不能超过20'))
+            } else if (value.trim().length > NAME_MAX_LEN) {
+                callback(new Error(`用户名名字数不能超过${NAME_MAX_LEN}`))
             } else {
                 callback()
             }
@@ -88,8 +89,21 @@ export default {
                 username: ''
             },
             addRules: {
-                groupId: [{ required: true, type: 'number', trigger: 'blur', message: '组名不能为空' }],
-                username: [{ required: true, validator: validateUsername, trigger: 'blur' }]
+                groupId: [
+                    {
+                        required: true,
+                        type: 'number',
+                        trigger: 'blur',
+                        message: '组名不能为空'
+                    }
+                ],
+                username: [
+                    {
+                        required: true,
+                        validator: validateUsername,
+                        trigger: 'blur'
+                    }
+                ]
             },
             tipsList: [],
             userList: [],
@@ -122,11 +136,16 @@ export default {
             console.log('handleSubmit')
             this.$refs.addMemberForm.validate(async valid => {
                 if (valid) {
-                    const { userId } = this.userList.find(
+                    const user = this.userList.find(
                         user => user.username === this.addMemberForm.username
                     )
 
-                    console.log('userId', userId)
+                    if (!user) {
+                        this.$Message.error('请从列表中选择成员')
+                        return
+                    }
+
+                    const { userId } = user
 
                     try {
                         const res = await addGroupMember({

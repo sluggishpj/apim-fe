@@ -51,6 +51,11 @@ export default {
             this.$emit('removeParent', data)
         },
 
+        // 修改父结点
+        editParent(data) {
+            this.$emit('editParent', data)
+        },
+
         clickChildHandler(data) {
             if (this.selectedItem !== data) {
                 this.$emit('change', data)
@@ -117,6 +122,19 @@ export default {
                                 on: {
                                     click: () => {
                                         this.removeParent(data)
+                                    }
+                                }
+                            }),
+                            h('Button', {
+                                props: Object.assign({}, this.buttonProps, {
+                                    icon: 'md-build'
+                                }),
+                                style: {
+                                    width: '32px'
+                                },
+                                on: {
+                                    click: () => {
+                                        this.editParent(data)
                                     }
                                 }
                             })
@@ -205,6 +223,7 @@ export default {
                 }
             }
         },
+
 
         removeChild(e, data) {
             this.$emit('removeChild', data)

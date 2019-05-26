@@ -11,6 +11,7 @@
                 :selectedItem="selectedItem"
                 @appendChild="showAddApi"
                 @removeParent="removeCat"
+                @editParent="updateCat"
                 @removeChild="removeApi"
                 @change="handleApiChange"
             />
@@ -23,6 +24,9 @@
             @success="fetchCatAndApiInfo"
         />
 
+        <!-- 修改分类弹窗 -->
+        <UpdateCat v-model="isShowUpdateCat" :catData="catData" @success="fetchCatAndApiInfo"/>
+
         <!-- 添加接口弹窗 -->
         <AddInterface
             v-if="catData.name"
@@ -33,7 +37,11 @@
         />
 
         <div class="right-content">
-            <InterfaceInfo :catList="catList" :projectId="Number(projectId)" :interfaceId="Number(interfaceId)"/>
+            <InterfaceInfo
+                :catList="catList"
+                :projectId="Number(projectId)"
+                :interfaceId="Number(interfaceId)"
+            />
         </div>
     </div>
 </template>
@@ -41,6 +49,7 @@
 import { getCatAndApiInfo, deleteCat, deleteApi } from '@/services'
 const CustomTree = () => import('@/components/CustomTree.vue')
 const AddCat = () => import('@/components/interfaceCat/AddCat.vue')
+const UpdateCat = () => import('@/components/interfaceCat/updateCat.vue')
 const AddInterface = () => import('@/components/interface/AddInterface.vue')
 const InterfaceInfo = () => import('@/components/interface/InterfaceInfo.vue')
 
@@ -49,6 +58,7 @@ export default {
     components: {
         CustomTree,
         AddCat,
+        UpdateCat,
         AddInterface,
         InterfaceInfo
     },
@@ -71,6 +81,8 @@ export default {
             catList: [],
             // 显示添加分类提示框
             isShowAddCat: false,
+            // 显示修改分类提示框
+            isShowUpdateCat: false,
             // 显示添加接口提示框
             isShowAddApi: false,
             catData: {},
@@ -165,6 +177,12 @@ export default {
                     }
                 }
             })
+        },
+
+        // 修改某个分类
+        updateCat(data) {
+            this.catData = data
+            this.isShowUpdateCat = true
         },
 
         // 删除某个接口

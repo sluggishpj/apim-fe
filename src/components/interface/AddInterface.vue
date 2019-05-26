@@ -15,11 +15,11 @@
             </FormItem>
 
             <FormItem prop="name" label="接口名称">
-                <Input type="text" v-model="apiForm.name" placeholder="请输入接口名"></Input>
+                <Input type="text" v-model="apiForm.name" placeholder="请输入接口名" :maxlength="NAME_MAX_LEN"></Input>
             </FormItem>
 
             <FormItem prop="path" label="接口路径">
-                <Input v-model="apiForm.path">
+                <Input v-model="apiForm.path" :maxlength="PATH_MAX_LEN">
                     <Select v-model="apiForm.method" slot="prepend" style="width: 80px">
                         <Option value="get">GET</Option>
                         <Option value="post">POST</Option>
@@ -32,6 +32,7 @@
 <script>
 import { Modal, Form, FormItem, Input, Select, Option } from 'iview'
 import { addApi } from '@/services'
+import { NAME_MAX_LEN, PATH_MAX_LEN } from '@/constant/len'
 
 export default {
     name: 'AddInterface',
@@ -62,8 +63,8 @@ export default {
         const validateName = (rule, value, callback) => {
             if (value.trim() === '') {
                 callback(new Error('接口名不能为空'))
-            } else if (value.trim().length > 50) {
-                callback(new Error('接口名长度不能超过50'))
+            } else if (value.trim().length > NAME_MAX_LEN) {
+                callback(new Error(`接口名长度不能超过${NAME_MAX_LEN}`))
             } else {
                 callback()
             }
@@ -75,13 +76,15 @@ export default {
             if (value.indexOf('/') !== 0) {
                 this.$set(this.apiForm, 'path', `/${value.trim()}`)
             }
-            if (value.trim().length > 100) {
-                callback(new Error('字数不能超过100'))
+            if (value.trim().length > PATH_MAX_LEN) {
+                callback(new Error(`字数不能超过${PATH_MAX_LEN}`))
             } else {
                 callback()
             }
         }
         return {
+            NAME_MAX_LEN,
+            PATH_MAX_LEN,
             apiForm: {
                 catId: '',
                 name: '',

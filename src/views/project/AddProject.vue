@@ -4,7 +4,11 @@
         <Form ref="addProjectForm" :model="addProjectForm" :rules="projectRules" :label-width="80">
             <!-- 项目名，必填 -->
             <FormItem class="add-project-form" prop="projectName" label="项目名">
-                <Input v-model="addProjectForm.projectName" placeholder="请输入项目名" :maxlength="50"></Input>
+                <Input
+                    v-model="addProjectForm.projectName"
+                    placeholder="请输入项目名"
+                    :maxlength="NAME_MAX_LEN"
+                ></Input>
             </FormItem>
 
             <!-- 项目描述 -->
@@ -14,7 +18,7 @@
                     placeholder="请输入项目描述"
                     type="textarea"
                     :autosize="true"
-                    :maxlength="200"
+                    :maxlength="DESC_MAX_LEN"
                 ></Input>
             </FormItem>
 
@@ -31,7 +35,11 @@
 
             <!-- 基本路径 -->
             <FormItem prop="basePath" class="add-project-form" label="基本路径">
-                <Input v-model="addProjectForm.basePath" placeholder="请输入基本路径" :maxlength="50"></Input>
+                <Input
+                    v-model="addProjectForm.basePath"
+                    placeholder="请输入基本路径"
+                    :maxlength="PATH_MAX_LEN"
+                ></Input>
             </FormItem>
 
             <!-- 权限，必填 -->
@@ -54,6 +62,7 @@
 import { Form, FormItem, Input, Select, Option, RadioGroup, Radio } from 'iview'
 import { addProject } from '@/services'
 import { mapGetters } from 'vuex'
+import { NAME_MAX_LEN, DESC_MAX_LEN, PATH_MAX_LEN } from '@/constant/len'
 
 export default {
     name: 'add-project',
@@ -85,8 +94,8 @@ export default {
         // 验证项目名
         const validateProjectName = (rule, value, callback) => {
             this.$set(this.addProjectForm, 'projectName', value.trim())
-            if (value.trim().length > 50) {
-                callback(new Error('字数不能超过50'))
+            if (value.trim().length > NAME_MAX_LEN) {
+                callback(new Error(`字数不能超过${NAME_MAX_LEN}`))
             } else {
                 callback()
             }
@@ -95,8 +104,8 @@ export default {
         // 验证项目描述
         const validateProjectDesc = (rule, value, callback) => {
             this.$set(this.addProjectForm, 'projectDesc', value.trim())
-            if (value.trim().length > 200) {
-                callback(new Error('字数不能超过200'))
+            if (value.trim().length > DESC_MAX_LEN) {
+                callback(new Error(`字数不能超过${DESC_MAX_LEN}`))
             } else {
                 callback()
             }
@@ -114,8 +123,8 @@ export default {
                     path = path.slice(0, path.length - 1)
                 }
                 this.$set(this.updateProjectForm, 'basePath', path)
-                if (path.length > 100) {
-                    callback(new Error('字数不能超过100'))
+                if (path.length > PATH_MAX_LEN) {
+                    callback(new Error(`字数不能超过${PATH_MAX_LEN}`))
                 } else {
                     callback()
                 }
@@ -125,6 +134,9 @@ export default {
         }
 
         return {
+            NAME_MAX_LEN,
+            DESC_MAX_LEN,
+            PATH_MAX_LEN,
             addProjectForm: {
                 projectName: '',
                 projectDesc: '',
@@ -141,7 +153,12 @@ export default {
                     { validator: validateProjectDesc, trigger: 'blur' }
                 ],
                 groupId: [
-                    { required: true, type: 'number', message: '请选择组', trigger: 'change' }
+                    {
+                        required: true,
+                        type: 'number',
+                        message: '请选择组',
+                        trigger: 'change'
+                    }
                 ],
                 projectType: [
                     { required: true, message: '请选择权限', trigger: 'change' }

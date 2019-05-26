@@ -11,7 +11,7 @@
 
             <!-- 接口名，必填 -->
             <FormItem class="form-item" prop="name" label="接口名称：">
-                <Input v-model="apiForm.name" placeholder="请输入接口名" :maxlength="50"></Input>
+                <Input v-model="apiForm.name" placeholder="请输入接口名" :maxlength="NAME_MAX_LEN"></Input>
             </FormItem>
 
             <!-- 分类 -->
@@ -23,7 +23,7 @@
 
             <!-- 接口路径 -->
             <FormItem class="form-item" prop="path" label="接口路径：">
-                <Input v-model="apiForm.path">
+                <Input v-model="apiForm.path" :maxlength="PATH_MAX_LEN">
                     <Select v-model="apiForm.method" slot="prepend" style="width: 80px">
                         <Option value="get">GET</Option>
                         <Option value="post">POST</Option>
@@ -69,6 +69,7 @@ import { Divider, Form, FormItem, Input, Select, Option } from 'iview'
 import { updateApi } from '@/services'
 import MonacoEditor from 'vue-monaco'
 import { mapActions } from 'vuex'
+import { NAME_MAX_LEN, PATH_MAX_LEN, CODE_MAX_LEN } from '@/constant/len'
 
 export default {
     props: {
@@ -104,8 +105,8 @@ export default {
         // 验证项目名
         const validateName = (rule, value, callback) => {
             this.$set(this.apiForm, 'name', value.trim())
-            if (value.trim().length > 50) {
-                callback(new Error('字数不能超过50'))
+            if (value.trim().length > NAME_MAX_LEN) {
+                callback(new Error(`字数不能超过${NAME_MAX_LEN}`))
             } else {
                 callback()
             }
@@ -125,8 +126,8 @@ export default {
 
                 this.$set(this.apiForm, 'path', path)
 
-                if (path.length > 100) {
-                    callback(new Error('字数不能超过100'))
+                if (path.length > PATH_MAX_LEN) {
+                    callback(new Error(`字数不能超过${PATH_MAX_LEN}`))
                 } else {
                     callback()
                 }
@@ -136,6 +137,8 @@ export default {
         }
 
         return {
+            NAME_MAX_LEN,
+            PATH_MAX_LEN,
             apiForm: {
                 name: '',
                 catId: '',
@@ -197,7 +200,12 @@ export default {
             }
         },
         isValidJson(str) {
-            if (str.length) {
+            if (str.length > CODE_MAX_LEN) {
+                this.$Message.error(`代码长度不能超过${CODE_MAX_LEN}`)
+                return false
+            }
+
+            if (str.length > 0) {
                 try {
                     JSON.parse(str)
                     return true

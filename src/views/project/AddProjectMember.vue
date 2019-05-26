@@ -35,6 +35,7 @@
 import { Form, FormItem, Input, AutoComplete } from 'iview'
 import { addProjectMember } from '@/services'
 import { mapActions, mapGetters } from 'vuex'
+import { NAME_MAX_LEN } from '@/constant/len'
 
 export default {
     name: 'AddProjectMember',
@@ -59,8 +60,8 @@ export default {
             this.$set(this.addMemberForm, 'username', value.trim())
             if (value.trim() === '') {
                 callback(new Error('用户名不能为空'))
-            } else if (value.trim().length > 50) {
-                callback(new Error('用户名名字数不能超过50'))
+            } else if (value.trim().length > NAME_MAX_LEN) {
+                callback(new Error(`用户名名字数不能超过${NAME_MAX_LEN}`))
             } else {
                 callback()
             }

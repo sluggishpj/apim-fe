@@ -1,15 +1,20 @@
 <template>
-    <!-- 添加分类表单 -->
+    <!-- 修改分类表单 -->
     <Modal
-        title="添加分类"
-        v-model="isShowAddCat"
+        title="修改分类"
+        v-model="isShowUpdateCat"
         :mask-closable="false"
         :loading="loading"
-        @on-ok="doAddCat"
+        @on-ok="doUpdateCat"
     >
         <Form ref="catForm" :model="catForm" class="cat-form" :rules="catRules" :label-width="80">
             <FormItem prop="name" label="分类名">
-                <Input type="text" v-model="catForm.name" placeholder="请输入分类名" :maxlength="NAME_MAX_LEN"></Input>
+                <Input
+                    type="text"
+                    v-model="catForm.name"
+                    placeholder="请输入分类名"
+                    :maxlength="NAME_MAX_LEN"
+                ></Input>
             </FormItem>
             <FormItem prop="desc" label="描述">
                 <Input
@@ -25,14 +30,14 @@
 </template>
 <script>
 import { Modal, Form, FormItem, Input } from 'iview'
-import { addCat } from '@/services'
+import { updateCat } from '@/services'
 import { NAME_MAX_LEN, DESC_MAX_LEN } from '@/constant/len'
 
 export default {
-    name: 'AddCat',
+    name: 'UpdateCat',
     props: {
-        projectId: {
-            type: Number,
+        catData: {
+            type: Object,
             required: true
         },
         value: {
@@ -62,6 +67,7 @@ export default {
             DESC_MAX_LEN,
             loading: true,
             catForm: {
+                catId: NaN,
                 name: '',
                 desc: ''
             },
@@ -84,7 +90,7 @@ export default {
         }
     },
     computed: {
-        isShowAddCat: {
+        isShowUpdateCat: {
             get() {
                 return this.value
             },
@@ -95,38 +101,44 @@ export default {
     },
     methods: {
         // 执行添加分类
-        async doAddCat() {
+        async doUpdateCat() {
             this.$refs.catForm.validate(async valid => {
                 if (valid) {
                     try {
-                        const res = await addCat({
-                            projectId: this.projectId,
+                        const res = await updateCat({
                             ...this.catForm
                         })
-                        console.log('addCat', res)
-                        this.isShowAddCat = false
+                        console.log('updateCat', res)
+                        this.isShowUpdateCat = false
 
                         if (res.code === 0) {
-                            this.$Message.success('添加成功')
+                            this.$Message.success('修改成功')
                             this.$emit('success')
                         } else {
                             this.$Message.error(res.msg)
                             this.$nextTick(() => {
-                                this.isShowAddCat = true
+                                this.isShowUpdateCat = true
                             })
                         }
                     } catch (err) {
                         console.log('addCat err', err)
-                        this.isShowAddCat = false
+                        this.isShowUpdateCat = false
                     }
                 } else {
-                    this.isShowAddCat = false
+                    this.isShowUpdateCat = false
                     this.$Message.error('请按要求完善信息')
                     this.$nextTick(() => {
-                        this.isShowAddCat = true
+                        this.isShowUpdateCat = true
                     })
                 }
             })
+        }
+    },
+    watch: {
+        catData(data) {
+            this.catForm.catId = data._id
+            this.catForm.name = data.name
+            this.catForm.desc = data.desc
         }
     }
 }
